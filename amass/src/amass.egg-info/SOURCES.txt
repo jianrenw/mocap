@@ -1,0 +1,14 @@
+LICENSE.txt
+README.md
+setup.py
+src/amass/__init__.py
+src/amass.egg-info/PKG-INFO
+src/amass.egg-info/SOURCES.txt
+src/amass.egg-info/dependency_links.txt
+src/amass.egg-info/top_level.txt
+src/amass/data/__init__.py
+src/amass/data/dfaust_synthetic_mocap.py
+src/amass/data/prepare_data.py
+src/amass/tools/__init__.py
+src/amass/tools/make_teaser_image.py
+src/amass/tools/notebook_tools.py
