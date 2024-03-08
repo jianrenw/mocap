@@ -1,7 +1,7 @@
 ```
 conda update -n base -c defaults conda
 
-conda create -n pytorch3d python=3.10 && conda activate pytorch3d
+conda create -n mocap python=3.10 && conda activate mocap
 
 conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 pytorch-cuda=11.8 -c pytorch -c nvidia
 
