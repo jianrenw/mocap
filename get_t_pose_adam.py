@@ -62,7 +62,10 @@ def set_t_pose(robot, t_pose_angles):
     # Replace these joint names and angles with your robot's configuration.
 
     for joint_index, angle in enumerate(t_pose_angles):
-        p.resetJointState(robot, joint_index, angle)
+        if joint_index == 27:
+            p.resetJointState(robot, joint_index, - 0.3)
+        else:
+            p.resetJointState(robot, joint_index, angle)
         create_joint_frame_visualization(robot, joint_index)
 
     joint_position_right_shoulder, _ = p.getLinkState(robot, joint_names.index('shoulderRoll_Right'))[4:6]
@@ -80,6 +83,4 @@ def set_t_pose(robot, t_pose_angles):
 set_t_pose(robot, t_pose_angles)
 
 # Run the simulation for a few seconds to visualize the T-pose
-for _ in range(10000):
-    p.stepSimulation()
-    time.sleep(time_step)
+time.sleep(1000)
