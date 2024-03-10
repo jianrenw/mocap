@@ -121,7 +121,7 @@ def load_data(file_path, bms):
     # ipdb.set_trace()
     joint_poses = body_trans_root.Jtr[:,:24,:].numpy()
     elbow_vertices = body_trans_root.v.numpy()[:, [1696, 1647, 5035, 5169]]
-    useful_poses = np.concatenate(joint_poses, elbow_vertices, axis=1)
+    useful_poses = np.concatenate((joint_poses, elbow_vertices), axis=1)
 
     framerate = bdata['mocap_framerate']
 
@@ -130,13 +130,13 @@ def load_data(file_path, bms):
 
 
 comp_device = "cpu"
-with Pool(15) as p:
+with Pool(5) as p:
     p.map(read_data, all_sequences)
 
-db = {}
-for seq in all_sequences:
-    db_file = osp.join("/home/jianrenw/mocap/data/out", "{}.pt".format(seq))
-    datas = joblib.load(db_file)
-    db.update(datas)
+# db = {}
+# for seq in all_sequences:
+#     db_file = osp.join("/home/jianrenw/mocap/data/out", "{}.pt".format(seq))
+#     datas = joblib.load(db_file)
+#     db.update(datas)
 
-joblib.dump(db, "/home/jianrenw/mocap/data/out/amass.pt")
+# joblib.dump(db, "/home/jianrenw/mocap/data/out/amass.pt")
