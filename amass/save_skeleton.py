@@ -120,13 +120,13 @@ def load_data(file_path, bms):
     body_trans_root = bm(**body_parms)
     # ipdb.set_trace()
     joint_poses = body_trans_root.Jtr[:,:24,:].numpy()
-    useful_poses = joint_poses
-    # useful_ids = [0, 1, 2, 4, 5, 7, 8, 10, 11, 16, 17, 18, 19, 20, 21]
-    # useful_poses = joint_poses[:, useful_ids, :]
+    elbow_vertices = body_trans_root.v.numpy()[:, [1696, 1647, 5035, 5169]]
+    useful_poses = np.concatenate(joint_poses, elbow_vertices, axis=1)
 
     framerate = bdata['mocap_framerate']
 
     return useful_poses, framerate
+
 
 
 comp_device = "cpu"
