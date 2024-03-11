@@ -134,12 +134,12 @@ comp_device = "cpu"
 #     p.map(read_data, all_sequences)
 
 # for seq in all_sequences:
-read_data("DanceDB")
+# read_data("DanceDB")
 
-# db = {}
-# for seq in all_sequences:
-#     db_file = osp.join("/home/jianrenw/mocap/data/out", "{}.pt".format(seq))
-#     datas = joblib.load(db_file)
-#     db.update(datas)
+db = {}
+for seq in all_sequences:
+    db_file = osp.join("/home/jianrenw/mocap/data/out", "{}.pt".format(seq))
+    datas = joblib.load(db_file)
+    db.update(datas)
 
-# joblib.dump(db, "/home/jianrenw/mocap/data/out/amass.pt")
+joblib.dump(db, "/home/jianrenw/mocap/data/out/amass.pt")
