@@ -31,15 +31,15 @@ all_sequences = [
     "DanceDB"
 ]
 
-smpl_path = "/home/jianrenw/mocap/data/body_models/smplh"
-dmpl_path = "/home/jianrenw/mocap/data/body_models/dmpls"
-folder = "/home/jianrenw/mocap/data/amass"
+smpl_path = "/home/jwang/data/body_models/smplh"
+dmpl_path = "/home/jwang/data/body_models/dmpls"
+folder = "/home/jwang/data/amass"
 
 
 def read_data(seq_name):
     # sequences = [osp.join(folder, x) for x in sorted(os.listdir(folder)) if osp.isdir(osp.join(folder, x))]
 
-    db_file = osp.join("/home/jianrenw/mocap/data/out", "{}.pt".format(seq_name))
+    db_file = osp.join("/home/jwang/mocap/data/out", "{}.pt".format(seq_name))
     if os.path.isfile(db_file):
         print(f"Skipping {seq_name} sequence...")
         return
@@ -133,8 +133,8 @@ comp_device = "cpu"
 # with Pool(5) as p:
 #     p.map(read_data, all_sequences)
 
-for seq in all_sequences:
-    read_data(seq)
+# for seq in all_sequences:
+read_data("DanceDB")
 
 # db = {}
 # for seq in all_sequences:
