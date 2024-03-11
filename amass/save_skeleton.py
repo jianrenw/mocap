@@ -130,8 +130,11 @@ def load_data(file_path, bms):
 
 
 comp_device = "cpu"
-with Pool(5) as p:
-    p.map(read_data, all_sequences)
+# with Pool(5) as p:
+#     p.map(read_data, all_sequences)
+
+for seq in all_sequences:
+    read_data(seq)
 
 # db = {}
 # for seq in all_sequences:
