@@ -88,6 +88,8 @@ def whole_body_ik(urdf_path, amass_data):
     restPoses = [0.0] * num_joints
     init_pose = [0.0] * num_joints
 
+    min_foot_z = np.inf
+
     for i in range(num_frames):
 
         init_pose[12] = waist_angles[i,0]
@@ -201,10 +203,12 @@ def whole_body_ik(urdf_path, amass_data):
         r_toe_pose = np.dot(r_rot_matrix@toe_R, [toe_len, 0, 0]) + r_ankle_pos
         r_heel_pose = np.dot(r_rot_matrix@heel_R, [heel_len, 0, 0]) + r_ankle_pos
 
-        if i == 0:
-            min_foot_z = np.min([l_toe_pose[2], r_toe_pose[2], l_heel_pose[2], r_heel_pose[2]])
+        if i < 30:
+            current_min = np.min([l_toe_pose[2], r_toe_pose[2], l_heel_pose[2], r_heel_pose[2]])
+            if min_foot_z > current_min:
+                min_foot_z = current_min
 
-        pelvis_copy[i, 2] = pelvis[i,2] - min_foot_z
+        pelvis_copy[i, 2] = pelvis[i,2]
 
         # Step the simulation
         joint_poses.append(ik_solution)
@@ -212,7 +216,7 @@ def whole_body_ik(urdf_path, amass_data):
     p.disconnect()
 
     result = {
-        'root_pos': pelvis_copy,
+        'root_pos': pelvis_copy - min_foot_z,
         'root_rot': lower_rot.as_quat(),
         'joint_poses': np.array(joint_poses),
         'joint_names': joint_names
@@ -222,29 +226,34 @@ def whole_body_ik(urdf_path, amass_data):
 
 
 
-def amass2adam(useful_poses):
+def amass2adam(skeleton):
 
-    num_frames = useful_poses.shape[0]
+    num_frames = skeleton.shape[0]
 
-    pelvis = useful_poses[:,0,:]
+    pelvis = skeleton[:,0,:]
 
-    l_upperarm = useful_poses[:,16,:]
-    l_forearm = useful_poses[:,18,:]
-    l_hand = useful_poses[:,20,:]
+    l_upperarm = skeleton[:,16,:]
+    l_forearm = skeleton[:,18,:]
+    l_hand = skeleton[:,20,:]
 
-    r_upperarm = useful_poses[:,17,:]
-    r_forearm = useful_poses[:,19,:]
-    r_hand = useful_poses[:,21,:]
+    r_upperarm = skeleton[:,17,:]
+    r_forearm = skeleton[:,19,:]
+    r_hand = skeleton[:,21,:]
 
-    l_thigh = useful_poses[:,1,:]
-    l_calf = useful_poses[:,4,:]
-    l_foot = useful_poses[:,7,:]
-    l_toe = useful_poses[:,10,:]
+    l_thigh = skeleton[:,1,:]
+    l_calf = skeleton[:,4,:]
+    l_foot = skeleton[:,7,:]
+    l_toe = skeleton[:,10,:]
 
-    r_thigh = useful_poses[:,2,:]
-    r_calf = useful_poses[:,5,:]
-    r_foot = useful_poses[:,8,:]
-    r_toe = useful_poses[:,11,:]
+    r_thigh = skeleton[:,2,:]
+    r_calf = skeleton[:,5,:]
+    r_foot = skeleton[:,8,:]
+    r_toe = skeleton[:,11,:]
+
+    l_elbow_o = skeleton[:,24,:]
+    l_elbow_i = skeleton[:,25,:]
+    r_elbow_i = skeleton[:,26,:]
+    r_elbow_o = skeleton[:,27,:]
 
     # upper body
     head = (l_upperarm + r_upperarm) / 2
@@ -262,53 +271,63 @@ def amass2adam(useful_poses):
     lower_y = np.cross(lower_z, lower_x)
     lower_rot = np.stack([lower_x, lower_y, lower_z], axis=2)
 
-    # left elbow
+    # left arm
     l_elbow_rot_z = l_forearm - l_hand
     l_elbow_rot_z = l_elbow_rot_z / np.linalg.norm(
         l_elbow_rot_z, axis=1, keepdims=True
     )
-
-    l_elbow_rot_y = l_upperarm - l_forearm
-    l_elbow_rot_y = l_elbow_rot_y / np.linalg.norm(
-        l_elbow_rot_y, axis=1, keepdims=True
+    l_elbow_rot_y_1 = l_elbow_i - l_elbow_o
+    l_elbow_rot_y_1 = l_elbow_rot_y_1 / np.linalg.norm(
+        l_elbow_rot_y_1, axis=1, keepdims=True
     )
-    l_elbow_rot_y = np.cross(l_elbow_rot_y, -l_elbow_rot_z)
-    l_elbow_rot_y = l_elbow_rot_y / np.linalg.norm(
-        l_elbow_rot_y, axis=1, keepdims=True
+    l_elbow_rot_y_2 = l_upperarm - l_forearm
+    l_elbow_rot_y_2 = l_elbow_rot_y_2 / np.linalg.norm(
+        l_elbow_rot_y_2, axis=1, keepdims=True
     )
+    l_elbow_rot_y_2 = np.cross(l_elbow_rot_y_2, -l_elbow_rot_z)
+    l_elbow_rot_y_2 = l_elbow_rot_y_2 / np.linalg.norm(
+        l_elbow_rot_y_2, axis=1, keepdims=True
+    )
+    correction = np.einsum('ij,ij->i', l_elbow_rot_y_1, l_elbow_rot_y_2) < 0
+    l_elbow_rot_y_2[correction] = -l_elbow_rot_y_2[correction]
 
-    l_elbow_rot_x = np.cross(l_elbow_rot_y, l_elbow_rot_z)
+    l_elbow_rot_x = np.cross(l_elbow_rot_y_2, l_elbow_rot_z)
     l_elbow_rot_x = l_elbow_rot_x / np.linalg.norm(
         l_elbow_rot_x, axis=1, keepdims=True
     )
 
-    l_elbow_rot = np.stack([l_elbow_rot_x, l_elbow_rot_y, l_elbow_rot_z], axis=2)
+    l_elbow_rot = np.stack([l_elbow_rot_x, l_elbow_rot_y_2, l_elbow_rot_z], axis=2)
 
     l_upperarm_dir = l_forearm - l_upperarm
     l_upperarm_dir = l_upperarm_dir / np.linalg.norm(
         l_upperarm_dir, axis=1, keepdims=True
     )
 
-    # right elbow
+    # right arm
     r_elbow_rot_z = r_forearm - r_hand
     r_elbow_rot_z = r_elbow_rot_z / np.linalg.norm(
         r_elbow_rot_z, axis=1, keepdims=True
     )
-
-    r_elbow_rot_y = r_upperarm - r_forearm
-    r_elbow_rot_y = r_elbow_rot_y / np.linalg.norm(
-        r_elbow_rot_y, axis=1, keepdims=True
+    r_elbow_rot_y_1 = r_elbow_i - r_elbow_o
+    r_elbow_rot_y_1 = r_elbow_rot_y_1 / np.linalg.norm(
+        r_elbow_rot_y_1, axis=1, keepdims=True
     )
-    r_elbow_rot_y = np.cross(r_elbow_rot_y, -r_elbow_rot_z)
-    r_elbow_rot_y = r_elbow_rot_y / np.linalg.norm(
-        r_elbow_rot_y, axis=1, keepdims=True
+    r_elbow_rot_y_2 = r_upperarm - r_forearm
+    r_elbow_rot_y_2 = r_elbow_rot_y_2 / np.linalg.norm(
+        r_elbow_rot_y_2, axis=1, keepdims=True
+    )   
+    r_elbow_rot_y_2 = np.cross(r_elbow_rot_y_2, -r_elbow_rot_z)
+    r_elbow_rot_y_2 = r_elbow_rot_y_2 / np.linalg.norm(
+        r_elbow_rot_y_2, axis=1, keepdims=True
     )
+    correction = np.einsum('ij,ij->i', r_elbow_rot_y_1, r_elbow_rot_y_2) < 0
+    r_elbow_rot_y_2[correction] = -r_elbow_rot_y_2[correction]
 
-    r_elbow_rot_x = np.cross(r_elbow_rot_y, r_elbow_rot_z)
+    r_elbow_rot_x = np.cross(r_elbow_rot_y_2, r_elbow_rot_z)
     r_elbow_rot_x = r_elbow_rot_x / np.linalg.norm(
         r_elbow_rot_x, axis=1, keepdims=True
     )
-    r_elbow_rot = np.stack([r_elbow_rot_x, r_elbow_rot_y, r_elbow_rot_z], axis=2)
+    r_elbow_rot = np.stack([r_elbow_rot_x, r_elbow_rot_y_2, r_elbow_rot_z], axis=2)
 
     r_upperarm_dir = r_forearm - r_upperarm
     r_upperarm_dir = r_upperarm_dir / np.linalg.norm(
@@ -316,78 +335,70 @@ def amass2adam(useful_poses):
     )
 
     # left knee
-    l_knee_rot_z = l_calf - l_foot
-    l_knee_rot_z = l_knee_rot_z / np.linalg.norm(
-        l_knee_rot_z, axis=1, keepdims=True
+    l_calf_dir = l_calf - l_foot
+    l_calf_dir = l_calf_dir / np.linalg.norm(
+        l_calf_dir, axis=1, keepdims=True
     )
-
-    l_knee_rot_y = l_calf - l_thigh
+    l_foot_dir = l_toe - l_foot
+    l_foot_dir = l_foot_dir / np.linalg.norm(
+        l_foot_dir, axis=1, keepdims=True
+    )
+    l_knee_rot_y = np.cross(l_calf_dir, l_foot_dir)
     l_knee_rot_y = l_knee_rot_y / np.linalg.norm(
         l_knee_rot_y, axis=1, keepdims=True
     )
-    l_knee_rot_y = np.cross(l_knee_rot_z, l_knee_rot_y)
-    l_knee_rot_y = l_knee_rot_y / np.linalg.norm(
-        l_knee_rot_y, axis=1, keepdims=True
-    )
-
-    l_knee_rot_x = np.cross(l_knee_rot_y, l_knee_rot_z)
+    l_knee_rot_x = np.cross(l_knee_rot_y, l_calf_dir)
     l_knee_rot_x = l_knee_rot_x / np.linalg.norm(
         l_knee_rot_x, axis=1, keepdims=True
     )
-    l_knee_rot = np.stack([l_knee_rot_x, l_knee_rot_y, l_knee_rot_z], axis=2)
+    l_knee_rot = np.stack([l_knee_rot_x, l_knee_rot_y, l_calf_dir], axis=2)
 
     l_thigh_dir = l_calf - l_thigh
     l_thigh_dir = l_thigh_dir / np.linalg.norm(l_thigh_dir, axis=1, keepdims=True)
 
+    # left ankle angle
+    cos = np.einsum('ij,ij->i', l_calf_dir, l_foot_dir) / (np.linalg.norm(l_calf_dir, axis=1) * np.linalg.norm(l_foot_dir, axis=1))
+    l_foot_angle = np.arccos(cos) - np.arctan(0.047/0.160) - np.pi/2
+
     # right knee
-    r_knee_rot_z = r_calf - r_foot
-    r_knee_rot_z = r_knee_rot_z / np.linalg.norm(
-        r_knee_rot_z, axis=1, keepdims=True
+    r_calf_dir = r_calf - r_foot
+    r_calf_dir = r_calf_dir / np.linalg.norm(
+        r_calf_dir, axis=1, keepdims=True
     )
-
-    r_knee_rot_y = r_calf - r_thigh
+    r_foot_dir = r_toe - r_foot
+    r_foot_dir = r_foot_dir / np.linalg.norm(
+        r_foot_dir, axis=1, keepdims=True
+    )
+    r_knee_rot_y = np.cross(r_calf_dir, r_foot_dir)
     r_knee_rot_y = r_knee_rot_y / np.linalg.norm(
         r_knee_rot_y, axis=1, keepdims=True
     )
-    r_knee_rot_y = np.cross(r_knee_rot_z, r_knee_rot_y)
-    r_knee_rot_y = r_knee_rot_y / np.linalg.norm(
-        r_knee_rot_y, axis=1, keepdims=True
-    )
-
-    r_knee_rot_x = np.cross(r_knee_rot_y, r_knee_rot_z)
+    r_knee_rot_x = np.cross(r_knee_rot_y, r_calf_dir)
     r_knee_rot_x = r_knee_rot_x / np.linalg.norm(
         r_knee_rot_x, axis=1, keepdims=True
     )
-    r_knee_rot = np.stack([r_knee_rot_x, r_knee_rot_y, r_knee_rot_z], axis=2)
+    r_knee_rot = np.stack([r_knee_rot_x, r_knee_rot_y, r_calf_dir], axis=2)
 
     r_thigh_dir = r_calf - r_thigh
     r_thigh_dir = r_thigh_dir / np.linalg.norm(r_thigh_dir, axis=1, keepdims=True)
 
+    # right ankle angle
+    cos = np.einsum('ij,ij->i', r_calf_dir, r_foot_dir) / (np.linalg.norm(r_calf_dir, axis=1) * np.linalg.norm(r_foot_dir, axis=1))
+    r_foot_angle = np.arccos(cos) - np.arctan(0.047/0.160) - np.pi/2
+
+
     # to pybullet
     upper_rot = R.from_matrix(upper_rot)
     lower_rot = R.from_matrix(lower_rot)
-    l_elbow_rot = R.from_matrix(l_elbow_rot)
-    r_elbow_rot = R.from_matrix(r_elbow_rot)
     l_knee_rot = R.from_matrix(l_knee_rot)
     r_knee_rot = R.from_matrix(r_knee_rot)
+    l_elbow_rot = R.from_matrix(l_elbow_rot)
+    r_elbow_rot = R.from_matrix(r_elbow_rot)
 
     # waist angle
     R_u_l = np.einsum('ijk,ikl->ijl', np.transpose(lower_rot.as_matrix(), (0, 2, 1)), upper_rot.as_matrix())
     R_u_l = R.from_matrix(R_u_l)
     waist_angles = R_u_l.as_euler('xyz', degrees=False)
-
-    # ankle angle
-    l_calf_dir = l_calf - l_foot
-    l_foot_dir = l_toe - l_foot
-    l_foot_dir = l_foot_dir / np.linalg.norm(l_foot_dir, axis=1, keepdims=True)
-    cos = np.einsum('ij,ij->i', l_calf_dir, l_foot_dir) / (np.linalg.norm(l_calf_dir, axis=1) * np.linalg.norm(l_foot_dir, axis=1))
-    l_foot_angle = np.arccos(cos) - np.arctan(0.047/0.160) - np.pi/2
-
-    r_calf_dir = r_calf - r_foot
-    r_foot_dir = r_toe - r_foot
-    r_foot_dir = r_foot_dir / np.linalg.norm(r_foot_dir, axis=1, keepdims=True)
-    cos = np.einsum('ij,ij->i', r_calf_dir, r_foot_dir) / (np.linalg.norm(r_calf_dir, axis=1) * np.linalg.norm(r_foot_dir, axis=1))
-    r_foot_angle = np.arccos(cos) - np.arctan(0.047/0.160) - np.pi/2
 
 
     amass_data = {'num_frames': num_frames,
@@ -413,60 +424,63 @@ def amass2adam(useful_poses):
 
 
 
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument(
-#         "--data_path", type=str, help="dataset directory", default="/home/jianrenw/foundation_locomotion/data"
-#     )
-#     parser.add_argument(
-#         "--out_dir", type=str, help="output directory", default="/home/jianrenw/foundation_locomotion/data"
-#     )
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--data_path", type=str, help="dataset directory", default="/home/jwang/mocap/data/out"
+    )
+    parser.add_argument(
+        "--out_dir", type=str, help="output directory", default="/home/jwang/mocap/data/out"
+    )
 
-#     args = parser.parse_args()
+    args = parser.parse_args()
 
-#     target_fr = 50
-#     amass_skeleton = joblib.load(args.data_path + "/amass_skeleton.pt")
-    
-#     # load robot to pybullet
-#     home_dir = os.path.expanduser('~')
-#     urdf_path = "{}/foundation_locomotion/robots/h1/h1.urdf".format(home_dir)
-
-#     keys = list(amass_skeleton.keys())
+    target_fr = 50
+    amass_skeleton = joblib.load(args.data_path + "/amass.pt")
+    amass_occlusion = joblib.load(args.data_path + "/amass_occlusion.pkl")
 
 
-    # def process(key):
-    #     useful_poses = amass_skeleton[key]['pose']
+    # load robot to pybullet
+    home_dir = os.path.expanduser('~')
+    urdf_path = "{}/mocap/adam/urdf/adam_v2.urdf".format(home_dir)
+
+    keys = list(amass_skeleton.keys())
+    occlusion_keys = list(amass_occlusion.keys())
+    occlusion_keys = [occlusion_key[2:] for occlusion_key in occlusion_keys]
+
+    def process(key):
+        if key in occlusion_keys:
+            print('occlusion', key)
+            return
+        useful_poses = amass_skeleton[key]['skeleton']
+        framerate = amass_skeleton[key]['mocap_framerate']
+        skip = int(framerate / target_fr)
+        useful_poses = useful_poses[::skip]
+        real_frame_rate = framerate / skip
+        amass_data = amass2adam(useful_poses)
+        result = whole_body_ik(urdf_path, amass_data)
+        result['real_frame_rate'] = real_frame_rate
+        joblib.dump(result, args.out_dir + "/temp/{}_data.pt".format(key))
+
+    with Pool(15) as p:
+        p.map(process, keys)
+
+
+    # h1_data = {}
+    # for key in tqdm(amass_skeleton.keys()):
+    #     if key in occlusion_keys:
+    #         print('occlusion', key)
+    #         continue
+    #     useful_poses = amass_skeleton[key]['skeleton']
     #     framerate = amass_skeleton[key]['mocap_framerate']
     #     skip = int(framerate / target_fr)
     #     useful_poses = useful_poses[::skip]
     #     real_frame_rate = framerate / skip
-    #     amass_data = amass2h1(useful_poses)
-    #     result = ik(urdf_path, amass_data)
-    #     result['real_frame_rate'] = real_frame_rate
-    #     # h1_data[key] = result
-    #     joblib.dump(result, args.out_dir + "/tmep/{}_data.pt".format(key))
-
-    # with Pool(15) as p:
-    #     p.map(process, keys)
-
-    # h1_data = {}
-    # for key in tqdm(amass_skeleton.keys()):
-    #     result = joblib.load(args.out_dir + "/tmep/{}_data.pt".format(key))
-    #     h1_data[key] = result
-    # joblib.dump(h1_data, "h1_data.pt")
-
-    # h1_data = {}
-    # for key in tqdm(amass_skeleton.keys()):
-    #     useful_poses = amass_skeleton[key]['pose']
-    #     framerate = amass_skeleton[key]['mocap_framerate']
-    #     skip = int(framerate / target_fr)
-    #     useful_poses = useful_poses[::skip]
-    #     real_frame_rate = framerate / skip
-    #     amass_data = amass2h1(useful_poses)
-    #     result = ik(urdf_path, amass_data)
+    #     amass_data = amass2adam(useful_poses)
+    #     result = whole_body_ik(urdf_path, amass_data)
     #     result['real_frame_rate'] = real_frame_rate
     #     h1_data[key] = result
-    # joblib.dump(h1_data, args.out_dir + "/h1_data.pt")
+    # joblib.dump(h1_data, args.out_dir + "/adam_data.pt")
 
     
 
