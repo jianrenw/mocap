@@ -262,9 +262,9 @@ def amass2h1(skeleton):
     lower_rot = np.stack([lower_x, lower_y, lower_z], axis=2)
 
     # left arm
-    l_elbow_rot_z = l_forearm - l_hand
-    l_elbow_rot_z = l_elbow_rot_z / np.linalg.norm(
-        l_elbow_rot_z, axis=1, keepdims=True
+    l_elbow_rot_x = l_hand - l_forearm
+    l_elbow_rot_x = l_elbow_rot_x / np.linalg.norm(
+        l_elbow_rot_x, axis=1, keepdims=True
     )
     l_elbow_rot_y_1 = l_elbow_i - l_elbow_o
     l_elbow_rot_y_1 = l_elbow_rot_y_1 / np.linalg.norm(
@@ -274,16 +274,16 @@ def amass2h1(skeleton):
     l_elbow_rot_y_2 = l_elbow_rot_y_2 / np.linalg.norm(
         l_elbow_rot_y_2, axis=1, keepdims=True
     )
-    l_elbow_rot_y_2 = np.cross(l_elbow_rot_y_2, -l_elbow_rot_z)
+    l_elbow_rot_y_2 = np.cross(l_elbow_rot_y_2, l_elbow_rot_x)
     l_elbow_rot_y_2 = l_elbow_rot_y_2 / np.linalg.norm(
         l_elbow_rot_y_2, axis=1, keepdims=True
     )
     correction = np.einsum('ij,ij->i', l_elbow_rot_y_1, l_elbow_rot_y_2) < 0
     l_elbow_rot_y_2[correction] = -l_elbow_rot_y_2[correction]
 
-    l_elbow_rot_x = np.cross(l_elbow_rot_y_2, l_elbow_rot_z)
-    l_elbow_rot_x = l_elbow_rot_x / np.linalg.norm(
-        l_elbow_rot_x, axis=1, keepdims=True
+    l_elbow_rot_z = np.cross(l_elbow_rot_x, l_elbow_rot_y_2)
+    l_elbow_rot_z = l_elbow_rot_z / np.linalg.norm(
+        l_elbow_rot_z, axis=1, keepdims=True
     )
 
     l_elbow_rot = np.stack([l_elbow_rot_x, l_elbow_rot_y_2, l_elbow_rot_z], axis=2)
@@ -294,9 +294,9 @@ def amass2h1(skeleton):
     )
 
     # right arm
-    r_elbow_rot_z = r_forearm - r_hand
-    r_elbow_rot_z = r_elbow_rot_z / np.linalg.norm(
-        r_elbow_rot_z, axis=1, keepdims=True
+    r_elbow_rot_x = r_hand - r_forearm
+    r_elbow_rot_x = r_elbow_rot_x / np.linalg.norm(
+        r_elbow_rot_x, axis=1, keepdims=True
     )
     r_elbow_rot_y_1 = r_elbow_i - r_elbow_o
     r_elbow_rot_y_1 = r_elbow_rot_y_1 / np.linalg.norm(
@@ -305,18 +305,19 @@ def amass2h1(skeleton):
     r_elbow_rot_y_2 = r_upperarm - r_forearm
     r_elbow_rot_y_2 = r_elbow_rot_y_2 / np.linalg.norm(
         r_elbow_rot_y_2, axis=1, keepdims=True
-    )   
-    r_elbow_rot_y_2 = np.cross(r_elbow_rot_y_2, -r_elbow_rot_z)
+    )
+    r_elbow_rot_y_2 = np.cross(r_elbow_rot_y_2, r_elbow_rot_x)
     r_elbow_rot_y_2 = r_elbow_rot_y_2 / np.linalg.norm(
         r_elbow_rot_y_2, axis=1, keepdims=True
     )
     correction = np.einsum('ij,ij->i', r_elbow_rot_y_1, r_elbow_rot_y_2) < 0
     r_elbow_rot_y_2[correction] = -r_elbow_rot_y_2[correction]
 
-    r_elbow_rot_x = np.cross(r_elbow_rot_y_2, r_elbow_rot_z)
-    r_elbow_rot_x = r_elbow_rot_x / np.linalg.norm(
-        r_elbow_rot_x, axis=1, keepdims=True
+    r_elbow_rot_z = np.cross(r_elbow_rot_x, r_elbow_rot_y_2)
+    r_elbow_rot_z = r_elbow_rot_z / np.linalg.norm(
+        r_elbow_rot_z, axis=1, keepdims=True
     )
+
     r_elbow_rot = np.stack([r_elbow_rot_x, r_elbow_rot_y_2, r_elbow_rot_z], axis=2)
 
     r_upperarm_dir = r_forearm - r_upperarm
@@ -442,32 +443,32 @@ if __name__ == "__main__":
     occlusion_keys = list(amass_occlusion.keys())
     occlusion_keys = [occlusion_key[2:] for occlusion_key in occlusion_keys]
 
-    # def process(key):
-    #     if key in occlusion_keys:
-    #         print('occlusion', key)
-    #         return
-    #     useful_poses = amass_skeleton[key]['skeleton']
-    #     framerate = amass_skeleton[key]['mocap_framerate']
-    #     skip = int(framerate / target_fr)
-    #     useful_poses = useful_poses[::skip]
-    #     real_frame_rate = framerate / skip
-    #     amass_data = amass2h1(useful_poses)
-    #     result = whole_body_ik(urdf_path, amass_data)
-    #     result['real_frame_rate'] = real_frame_rate
-    #     joblib.dump(result, args.out_dir + "/temp/{}_h1.pt".format(key))
-
-    # with Pool(15) as p:
-    #     p.map(process, keys)
-
-
-    adam_data = {}
-    for key in tqdm(amass_skeleton.keys()):
+    def process(key):
         if key in occlusion_keys:
             print('occlusion', key)
-            continue
-        result = joblib.load(args.out_dir + "/temp/{}_h1.pt".format(key))
-        adam_data[key] = result
-    joblib.dump(adam_data, "h1_data.pt")
+            return
+        useful_poses = amass_skeleton[key]['skeleton']
+        framerate = amass_skeleton[key]['mocap_framerate']
+        skip = int(framerate / target_fr)
+        useful_poses = useful_poses[::skip]
+        real_frame_rate = framerate / skip
+        amass_data = amass2h1(useful_poses)
+        result = whole_body_ik(urdf_path, amass_data)
+        result['real_frame_rate'] = real_frame_rate
+        joblib.dump(result, args.out_dir + "/temp/{}_h1.pt".format(key))
+
+    with Pool(15) as p:
+        p.map(process, keys)
+
+
+    # adam_data = {}
+    # for key in tqdm(amass_skeleton.keys()):
+    #     if key in occlusion_keys:
+    #         print('occlusion', key)
+    #         continue
+    #     result = joblib.load(args.out_dir + "/temp/{}_h1.pt".format(key))
+    #     adam_data[key] = result
+    # joblib.dump(adam_data, "h1_data.pt")
 
     
 

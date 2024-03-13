@@ -125,17 +125,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # load motion data
-    adam_poses = joblib.load(args.data_path + "/adam.pt")
+    h1_poses = joblib.load(args.data_path + "/h1_data.pt")
 
     isaac_data = {}
 
-    for key in tqdm(adam_poses.keys()):
-        adam_pose = adam_poses[key]
-        result = adam_to_isaac(adam_pose)
+    for key in tqdm(h1_poses.keys()):
+        adam_pose = h1_poses[key]
+        result = h1_to_isaac(adam_pose)
         if result is not None:
             isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_h1.pt")
 
     # save one
     # key = list(adam_poses.keys())[10]
