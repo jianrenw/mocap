@@ -59,7 +59,8 @@ cam_target = gymapi.Vec3(0, 2, 1.5)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-data_path = "data/out/isaac_h1.pt"
+# data_path = "data/out/isaac_h1.pt"
+data_path = "data/out/h1_data.pt"
 h1_poses = joblib.load(data_path)
 keys = list(h1_poses.keys())
 key = keys[10]
@@ -74,7 +75,8 @@ frame_num = len(root_pos)
 # root_pos[:,2] += 0.05
 
 root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
-joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 19)],axis=2).type(torch.float32)
+# joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 19)],axis=2).type(torch.float32)
+joint_poses = torch.stack([torch.from_numpy(dof_pos[:,:19]), torch.zeros(frame_num, 19)],axis=2).type(torch.float32)
 # print(root_states)
 
 

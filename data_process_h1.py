@@ -461,14 +461,14 @@ if __name__ == "__main__":
     #     p.map(process, keys)
 
 
-    adam_data = {}
+    h1_data = {}
     for key in tqdm(amass_skeleton.keys()):
         if key in occlusion_keys:
-            print('occlusion', key)
+            print('occlusion', key) 
             continue
         result = joblib.load(args.out_dir + "/temp/{}_h1.pt".format(key))
-        adam_data[key] = result
-    joblib.dump(adam_data, "h1_data.pt")
+        h1_data[key] = result
+    joblib.dump(h1_data, "h1_data.pt")
 
     
 
