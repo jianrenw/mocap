@@ -38,8 +38,8 @@ plane_params.restitution = 0
 gym.add_ground(sim, plane_params)
 
 # add cartpole urdf asset
-asset_root = "adam"
-asset_file = "urdf/adam.urdf"
+asset_root = "h1"
+asset_file = "h1.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 
 spacing = 2.0
@@ -54,19 +54,19 @@ pose.p = gymapi.Vec3(0.0, 0.0, 2.0)
 actor_handle = gym.create_actor(env, robot_asset, pose, "H1_actor", 0, 1)
 
 
-def adam_to_isaac(adam_pose):
+def h1_to_isaac(h1_pose):
 
-    root_pos = adam_pose["root_pos"]
-    root_rot = adam_pose["root_rot"]
-    joint_poses = adam_pose["joint_poses"][:,[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,24,25,26,27]]
-    joint_names = adam_pose["joint_names"]
+    root_pos = h1_pose["root_pos"]
+    root_rot = h1_pose["root_rot"]
+    joint_poses = h1_pose["joint_poses"]
+    joint_names = h1_pose["joint_names"]
     frame_num = len(root_pos)
 
     if frame_num <= 2:
         return None
 
     root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
-    dof_states = torch.stack([torch.from_numpy(joint_poses), torch.zeros(frame_num, 23)],axis=2).type(torch.float32)
+    dof_states = torch.stack([torch.from_numpy(joint_poses[:,:19]), torch.zeros(frame_num, 19)],axis=2).type(torch.float32)
     rigid_body_states = []
 
     # Simulate
@@ -80,7 +80,7 @@ def adam_to_isaac(adam_pose):
         rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
         rigid_body_states.append(rigid_body_state.clone())
 
-    dt = 1 / adam_pose['real_frame_rate'] # 
+    dt = 1 / h1_pose['real_frame_rate'] # 
     rigid_body_states = torch.stack(rigid_body_states, dim=0)
     current_body_pos = rigid_body_states[:-1, :, 0:3]
     next_body_pos = rigid_body_states[1:, :, 0:3]
@@ -100,14 +100,14 @@ def adam_to_isaac(adam_pose):
     result = {
         'body_pos': current_body_pos.numpy(), # [frame_num-1, 23, 3]
         'root_pos': root_pos[:-1], # [frame_num-1, 3]
-        'dof_pos': joint_poses[:-1], # [frame_num-1, 23]
+        'dof_pos': joint_poses[:-1, :19], # [frame_num-1, 23]
         'body_rot': current_body_rot.numpy(), # [frame_num-1, 23, 4]
         'root_rot': root_rot[:-1], # [frame_num-1, 4]
         'body_vel': body_vel.numpy(), # [frame_num-1, 23, 3]
         'root_vel': body_vel[:,0,:].numpy(), # [frame_num-1, 3]
         'body_angular_vel': body_angular_vel.numpy(), # [frame_num-1, 23, 3]
         'root_angular_vel': body_angular_vel[:,0,:].numpy(), # [frame_num-1, 3]
-        'dof_vel': dof_vel, # [frame_num-1, 23]
+        'dof_vel': dof_vel[:,:19], # [frame_num-1, 23]
         'dt': dt, # scalar
     }
 

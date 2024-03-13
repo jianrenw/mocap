@@ -165,13 +165,12 @@ def whole_body_ik(urdf_path, amass_data):
 
         ik_solution = np.zeros(num_joints)
         ik_solution[:4] = ik_solution_lf[:4]
-        ik_solution[4] = l_foot_angle[i,0]
+        ik_solution[4] = l_foot_angle[i]
         ik_solution[5:9] = ik_solution_rf[5:9]
-        ik_solution[9] = r_foot_angle[i,0]
+        ik_solution[9] = r_foot_angle[i]
         ik_solution[10] = torso_angle[i,0]
         ik_solution[11:15] = ik_solution_lh[11:15]
         ik_solution[15:19] = ik_solution_rh[15:19]
-
 
         restPoses = ik_solution
         init_pose = ik_solution
@@ -443,32 +442,32 @@ if __name__ == "__main__":
     occlusion_keys = list(amass_occlusion.keys())
     occlusion_keys = [occlusion_key[2:] for occlusion_key in occlusion_keys]
 
-    def process(key):
-        if key in occlusion_keys:
-            print('occlusion', key)
-            return
-        useful_poses = amass_skeleton[key]['skeleton']
-        framerate = amass_skeleton[key]['mocap_framerate']
-        skip = int(framerate / target_fr)
-        useful_poses = useful_poses[::skip]
-        real_frame_rate = framerate / skip
-        amass_data = amass2h1(useful_poses)
-        result = whole_body_ik(urdf_path, amass_data)
-        result['real_frame_rate'] = real_frame_rate
-        joblib.dump(result, args.out_dir + "/temp/{}_h1.pt".format(key))
-
-    with Pool(15) as p:
-        p.map(process, keys)
-
-
-    # adam_data = {}
-    # for key in tqdm(amass_skeleton.keys()):
+    # def process(key):
     #     if key in occlusion_keys:
     #         print('occlusion', key)
-    #         continue
-    #     result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
-    #     adam_data[key] = result
-    # joblib.dump(adam_data, "adam_data.pt")
+    #         return
+    #     useful_poses = amass_skeleton[key]['skeleton']
+    #     framerate = amass_skeleton[key]['mocap_framerate']
+    #     skip = int(framerate / target_fr)
+    #     useful_poses = useful_poses[::skip]
+    #     real_frame_rate = framerate / skip
+    #     amass_data = amass2h1(useful_poses)
+    #     result = whole_body_ik(urdf_path, amass_data)
+    #     result['real_frame_rate'] = real_frame_rate
+    #     joblib.dump(result, args.out_dir + "/temp/{}_h1.pt".format(key))
+
+    # with Pool(15) as p:
+    #     p.map(process, keys)
+
+
+    adam_data = {}
+    for key in tqdm(amass_skeleton.keys()):
+        if key in occlusion_keys:
+            print('occlusion', key)
+            continue
+        result = joblib.load(args.out_dir + "/temp/{}_h1.pt".format(key))
+        adam_data[key] = result
+    joblib.dump(adam_data, "h1_data.pt")
 
     
 
