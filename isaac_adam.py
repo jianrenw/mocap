@@ -41,6 +41,9 @@ gym.add_ground(sim, plane_params)
 asset_root = "adam"
 asset_file = "urdf/adam.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
+rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
+print(rigid_body_names)
+print(len(rigid_body_names))
 
 spacing = 2.0
 lower = gymapi.Vec3(-spacing, -spacing, -spacing)
@@ -74,11 +77,11 @@ def adam_to_isaac(adam_pose):
 
         gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
         gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(dof_states[i]))
-        gym.simulate(sim)
         gym.refresh_rigid_body_state_tensor(sim)
         rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
         rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
         rigid_body_states.append(rigid_body_state.clone())
+
 
     dt = 1 / adam_pose['real_frame_rate'] # 
     rigid_body_states = torch.stack(rigid_body_states, dim=0)
@@ -125,7 +128,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # load motion data
-    adam_poses = joblib.load(args.data_path + "/adam.pt")
+    adam_poses = joblib.load(args.data_path + "/adam_data.pt")
 
     isaac_data = {}
 
@@ -135,32 +138,13 @@ if __name__ == "__main__":
         if result is not None:
             isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam.pt")
 
     # save one
     # key = list(adam_poses.keys())[10]
     # adam_pose = adam_poses[key]
     # result = adam_to_isaac(adam_pose)
     # joblib.dump(result, args.out_dir + "/{}.pt".format(key))
-    
-
-    # data_path = "/home/jianrenw/Research/foundation_locomotion/data/h1_isaac.pt"
-    # isaac_data = joblib.load(data_path)
-    # keys = list(isaac_data.keys())
-    # for key in keys:
-    #     result = isaac_data[key]
-    #     print(result['root_pos'].shape)
-    #     print(result['root_rot'].shape)
-    #     print(result['dof_pos'].shape)
-    #     print(result['body_pos'].shape)
-    #     print(result['body_rot'].shape)
-    #     print(result['body_vel'].shape)
-    #     print(result['root_vel'].shape)
-    #     print(result['body_angular_vel'].shape)
-    #     print(result['root_angular_vel'].shape)
-    #     print(result['dof_vel'].shape)
-    #     break
-
 
 
 
