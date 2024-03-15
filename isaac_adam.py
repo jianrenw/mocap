@@ -101,14 +101,14 @@ def adam_to_isaac(adam_pose):
     body_angular_vel = diff_global_body_angle[:,:,None] * diff_global_body_axis / dt
 
     result = {
-        'body_pos': current_body_pos.numpy(), # [frame_num-1, 23, 3]
+        'body_pos': current_body_pos.numpy(), # [frame_num-1, 35, 3]
         'root_pos': root_pos[:-1], # [frame_num-1, 3]
         'dof_pos': joint_poses[:-1], # [frame_num-1, 23]
-        'body_rot': current_body_rot.numpy(), # [frame_num-1, 23, 4]
+        'body_rot': current_body_rot.numpy(), # [frame_num-1, 35, 4]
         'root_rot': root_rot[:-1], # [frame_num-1, 4]
-        'body_vel': body_vel.numpy(), # [frame_num-1, 23, 3]
+        'body_vel': body_vel.numpy(), # [frame_num-1, 35, 3]
         'root_vel': body_vel[:,0,:].numpy(), # [frame_num-1, 3]
-        'body_angular_vel': body_angular_vel.numpy(), # [frame_num-1, 23, 3]
+        'body_angular_vel': body_angular_vel.numpy(), # [frame_num-1, 35, 3]
         'root_angular_vel': body_angular_vel[:,0,:].numpy(), # [frame_num-1, 3]
         'dof_vel': dof_vel, # [frame_num-1, 23]
         'dt': dt, # scalar
