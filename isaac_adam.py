@@ -42,8 +42,6 @@ asset_root = "adam"
 asset_file = "urdf/adam.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
-print(rigid_body_names)
-print(len(rigid_body_names))
 
 spacing = 2.0
 lower = gymapi.Vec3(-spacing, -spacing, -spacing)
@@ -101,14 +99,14 @@ def adam_to_isaac(adam_pose):
     body_angular_vel = diff_global_body_angle[:,:,None] * diff_global_body_axis / dt
 
     result = {
-        'body_pos': current_body_pos.numpy(), # [frame_num-1, 35, 3]
+        'body_pos': current_body_pos.numpy(), # [frame_num-1, 36, 3]
         'root_pos': root_pos[:-1], # [frame_num-1, 3]
         'dof_pos': joint_poses[:-1], # [frame_num-1, 23]
-        'body_rot': current_body_rot.numpy(), # [frame_num-1, 35, 4]
+        'body_rot': current_body_rot.numpy(), # [frame_num-1, 36, 4]
         'root_rot': root_rot[:-1], # [frame_num-1, 4]
-        'body_vel': body_vel.numpy(), # [frame_num-1, 35, 3]
+        'body_vel': body_vel.numpy(), # [frame_num-1, 36, 3]
         'root_vel': body_vel[:,0,:].numpy(), # [frame_num-1, 3]
-        'body_angular_vel': body_angular_vel.numpy(), # [frame_num-1, 35, 3]
+        'body_angular_vel': body_angular_vel.numpy(), # [frame_num-1, 36, 3]
         'root_angular_vel': body_angular_vel[:,0,:].numpy(), # [frame_num-1, 3]
         'dof_vel': dof_vel, # [frame_num-1, 23]
         'dt': dt, # scalar

@@ -37,6 +37,10 @@ asset_root = "adam"
 asset_file = "urdf/adam.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
+rigid_body_dict = gym.get_asset_rigid_body_dict(robot_asset)
+
+print(rigid_body_names)
+print(rigid_body_dict)
 
 spacing = 2.0
 lower = gymapi.Vec3(-spacing, -spacing, -spacing)
@@ -63,7 +67,8 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 data_path = "data/out/isaac_adam.pt"
 adam_poses = joblib.load(data_path)
 keys = list(adam_poses.keys())
-key = keys[10]
+# key = keys[10]
+key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
 adam_pose = adam_poses[key]
 
 
@@ -77,13 +82,15 @@ root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot),
 joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 23)],axis=2).type(torch.float32)
 # print(root_states)
 
+print(body_pos.shape)
+
 
 def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
     track_link = [rigid_body_names.index('footLeftY'), rigid_body_names.index('footRightY'), rigid_body_names.index('wristRollLeft'), rigid_body_names.index('wristRollRight')]
     updated_body_pos = body_pos[track_link]
     for ubp in updated_body_pos:
         sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)
-        sphere_geom = gymutil.WireframeSphereGeometry(radius, 4, 4, None, color=(1, 0, 0))
+        sphere_geom = gymutil.WireframeSphereGeometry(radius, 10, 10, None, color=(1, 0, 0))
         gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
 
 
@@ -92,13 +99,10 @@ for i in range(frame_num):
 
     gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
     gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
-    gym.refresh_rigid_body_state_tensor(sim)
-    # rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
-    # rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
-    # draw_reference(gym, viewer, env, rigid_body_state)
+    draw_reference(gym, viewer, env, body_pos[i])
 
     # # update the viewer
     gym.step_graphics(sim)
     gym.draw_viewer(viewer, sim, True)
     time.sleep(0.05)
-    # gym.clear_lines(viewer)
+    gym.clear_lines(viewer)
