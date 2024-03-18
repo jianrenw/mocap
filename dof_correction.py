@@ -54,9 +54,10 @@ pose.p = gymapi.Vec3(0.0, 0.0, 2.0)
 actor_handle = gym.create_actor(env, robot_asset, pose, "adam_actor", 0, 1)
 
 props = gym.get_actor_dof_properties(env, actor_handle)
-print(props['lower'])
-print(props['upper'])
-
+names = gym.get_actor_dof_names(env, actor_handle)
+lower = props['lower']
+upper = props['upper']
+print(names)
 
 # create viewer using the default camera properties
 viewer = gym.create_viewer(sim, gymapi.CameraProperties())
@@ -64,15 +65,11 @@ if viewer is None:
     raise ValueError('*** Failed to create viewer')
 
 # Look at the first env
-cam_pos = gymapi.Vec3(8, 4, 1.5)
-cam_target = gymapi.Vec3(0, 2, 1.5)
-gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
+# cam_pos = gymapi.Vec3(8, 4, 1.5)
+# cam_target = gymapi.Vec3(0, 2, 1.5)
+# gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-# data_path = "data/out/isaac_adam.pt"
-# adam_poses = joblib.load(data_path)
-# keys = list(adam_poses.keys())
-# key = keys[10]
 key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
 data_path = "{}.pt".format(key)
 adam_pose = joblib.load(data_path)
@@ -87,30 +84,8 @@ frame_num = len(root_pos)
 
 root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
 joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 23)],axis=2).type(torch.float32)
-print(joint_poses[0])
 
-# print(body_pos.shape)
-
-
-# def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
-#     track_link = [rigid_body_names.index('footLeftY'), rigid_body_names.index('footRightY'), rigid_body_names.index('wristRollLeft'), rigid_body_names.index('wristRollRight')]
-#     updated_body_pos = body_pos[track_link]
-#     for ubp in updated_body_pos:
-#         sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)
-#         sphere_geom = gymutil.WireframeSphereGeometry(radius, 10, 10, None, color=(1, 0, 0))
-#         gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
-
-
-# Simulate
-for _ in range(100000):
-    i = 0
-    gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
-    gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
-    # draw_reference(gym, viewer, env, body_pos[i])
-
-    # # update the viewer
-    gym.step_graphics(sim)
-    gym.draw_viewer(viewer, sim, True)
-    time.sleep(1)
-    # time.sleep(5000)
-    # gym.clear_lines(viewer)
+for i, joint_pose in enumerate(dof_pos[0]):
+    # import ipdb; ipdb.set_trace()
+    if joint_pose<lower[i] or joint_pose>upper[i]:
+        print(names[i], joint_pose, lower[i], upper[i])

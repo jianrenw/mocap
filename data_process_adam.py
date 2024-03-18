@@ -250,8 +250,8 @@ def amass2adam(skeleton):
     r_foot = skeleton[:,8,:]
     r_toe = skeleton[:,11,:]
 
-    l_elbow_o = skeleton[:,24,:]
-    l_elbow_i = skeleton[:,25,:]
+    l_elbow_i = skeleton[:,24,:]
+    l_elbow_o = skeleton[:,25,:]
     r_elbow_i = skeleton[:,26,:]
     r_elbow_o = skeleton[:,27,:]
 
@@ -466,14 +466,14 @@ if __name__ == "__main__":
     #     p.map(process, keys)
 
 
-    adam_data = {}
-    for key in tqdm(amass_skeleton.keys()):
-        if key in occlusion_keys:
-            print('occlusion', key)
-            continue
-        result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
-        adam_data[key] = result
-    joblib.dump(adam_data, "adam_data.pt")
+    # adam_data = {}
+    # for key in tqdm(amass_skeleton.keys()):
+    #     if key in occlusion_keys:
+    #         print('occlusion', key)
+    #         continue
+    #     result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
+    #     adam_data[key] = result
+    # joblib.dump(adam_data, "adam_data.pt")
 
     
 
