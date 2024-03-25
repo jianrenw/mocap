@@ -123,10 +123,10 @@ def adam_to_isaac(adam_pose):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jwang/mocap/data/out"
+        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/out"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jwang/mocap/data/out"
+        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/out"
     )
 
     args = parser.parse_args()
@@ -134,21 +134,21 @@ if __name__ == "__main__":
     # load motion data
     adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
 
-    isaac_data = {}
+    # isaac_data = {}
 
-    for key in tqdm(adam_poses.keys()):
-        adam_pose = adam_poses[key]
-        result = adam_to_isaac(adam_pose)
-        if result is not None:
-            isaac_data[key] = result
+    # for key in tqdm(adam_poses.keys()):
+    #     adam_pose = adam_poses[key]
+    #     result = adam_to_isaac(adam_pose)
+    #     if result is not None:
+    #         isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite.pt")
+    # joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite.pt")
 
     # save one
-    # key = list(adam_poses.keys())[10]
-    # adam_pose = adam_poses[key]
-    # result = adam_to_isaac(adam_pose)
-    # joblib.dump(result, args.out_dir + "/{}.pt".format(key))
+    key = list(adam_poses.keys())[10]
+    adam_pose = adam_poses[key]
+    result = adam_to_isaac(adam_pose)
+    joblib.dump(result, args.out_dir + "/{}.pt".format(key))
 
 
 
