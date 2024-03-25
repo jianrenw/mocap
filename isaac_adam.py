@@ -84,7 +84,8 @@ def adam_to_isaac(adam_pose):
         gym.refresh_rigid_body_state_tensor(sim)
         rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
         rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
-        rigid_body_states.append(rigid_body_state.clone())
+        if i >= 1: # skip the first frame
+            rigid_body_states.append(rigid_body_state.clone())
 
 
     dt = 1 / adam_pose['real_frame_rate'] # 
@@ -105,17 +106,17 @@ def adam_to_isaac(adam_pose):
     body_angular_vel = diff_global_body_angle[:,:,None] * diff_global_body_axis / dt
 
     result = {
-        'body_pos': current_body_pos.numpy(), # [frame_num-1, 36, 3]
-        'root_pos': root_pos[:-1], # [frame_num-1, 3]
-        'dof_pos': joint_poses[:-1], # [frame_num-1, 23]
-        'body_rot': current_body_rot.numpy(), # [frame_num-1, 36, 4]
-        'root_rot': root_rot[:-1], # [frame_num-1, 4]
-        'body_vel': body_vel.numpy(), # [frame_num-1, 36, 3]
-        'root_vel': body_vel[:,0,:].numpy(), # [frame_num-1, 3]
-        'body_angular_vel': body_angular_vel.numpy(), # [frame_num-1, 36, 3]
-        'root_angular_vel': body_angular_vel[:,0,:].numpy(), # [frame_num-1, 3]
-        'dof_vel': dof_vel, # [frame_num-1, 23]
-        'dt': dt, # scalar
+        'body_pos': current_body_pos.numpy(), 
+        'root_pos': root_pos[:-1], 
+        'dof_pos': joint_poses[:-1], 
+        'body_rot': current_body_rot.numpy(), 
+        'root_rot': root_rot[:-1], 
+        'body_vel': body_vel.numpy(), 
+        'root_vel': body_vel[:,0,:].numpy(), 
+        'body_angular_vel': body_angular_vel.numpy(), 
+        'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
+        'dof_vel': dof_vel, 
+        'dt': dt, 
     }
 
     return result
@@ -134,15 +135,15 @@ if __name__ == "__main__":
     # load motion data
     adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
 
-    # isaac_data = {}
+    isaac_data = {}
 
-    # for key in tqdm(adam_poses.keys()):
-    #     adam_pose = adam_poses[key]
-    #     result = adam_to_isaac(adam_pose)
-    #     if result is not None:
-    #         isaac_data[key] = result
+    for key in tqdm(adam_poses.keys()):
+        adam_pose = adam_poses[key]
+        result = adam_to_isaac(adam_pose)
+        if result is not None:
+            isaac_data[key] = result
 
-    # joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite.pt")
 
     # save one
     key = list(adam_poses.keys())[10]
