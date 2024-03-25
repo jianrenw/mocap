@@ -38,10 +38,13 @@ plane_params.restitution = 0
 gym.add_ground(sim, plane_params)
 
 # add cartpole urdf asset
-asset_root = "adam"
-asset_file = "urdf/adam.urdf"
+# asset_root = "adam"
+# asset_file = "urdf/adam.urdf"
+asset_root = "adam_lite_v2"
+asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
+dof_names = gym.get_asset_dof_names(robot_asset)
 
 spacing = 2.0
 lower = gymapi.Vec3(-spacing, -spacing, -spacing)
@@ -59,15 +62,18 @@ def adam_to_isaac(adam_pose):
 
     root_pos = adam_pose["root_pos"]
     root_rot = adam_pose["root_rot"]
-    joint_poses = adam_pose["joint_poses"][:,[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,24,25,26,27]]
+    joint_poses = adam_pose["joint_poses"]
     joint_names = adam_pose["joint_names"]
+    useful_list = [joint_names.index(name) for name in dof_names]
+    joint_poses = joint_poses[:, useful_list]
+    
     frame_num = len(root_pos)
 
     if frame_num <= 2:
         return None
 
     root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
-    dof_states = torch.stack([torch.from_numpy(joint_poses), torch.zeros(frame_num, 23)],axis=2).type(torch.float32)
+    dof_states = torch.stack([torch.from_numpy(joint_poses), torch.zeros(frame_num, len(dof_names))],axis=2).type(torch.float32)
     rigid_body_states = []
 
     # Simulate
@@ -117,16 +123,16 @@ def adam_to_isaac(adam_pose):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/out"
+        "--data_path", type=str, help="dataset directory", default="/home/jwang/mocap/data/out"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/out"
+        "--out_dir", type=str, help="output directory", default="/home/jwang/mocap/data/out"
     )
 
     args = parser.parse_args()
 
     # load motion data
-    adam_poses = joblib.load(args.data_path + "/adam_data.pt")
+    adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
 
     isaac_data = {}
 
@@ -136,7 +142,7 @@ if __name__ == "__main__":
         if result is not None:
             isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite.pt")
 
     # save one
     # key = list(adam_poses.keys())[10]

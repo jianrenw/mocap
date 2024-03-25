@@ -454,37 +454,37 @@ if __name__ == "__main__":
 
     # load robot to pybullet
     home_dir = os.path.expanduser('~')
-    urdf_path = "{}/mocap/adam/urdf/adam_v2.urdf".format(home_dir)
+    urdf_path = "{}/mocap/adam_lite_v2/urdf/adam_lite_pybullet.urdf".format(home_dir)
 
     keys = list(amass_skeleton.keys())
     occlusion_keys = list(amass_occlusion.keys())
     occlusion_keys = [occlusion_key[2:] for occlusion_key in occlusion_keys]
 
-    def process(key):
-        if key in occlusion_keys:
-            print('occlusion', key)
-            return
-        useful_poses = amass_skeleton[key]['skeleton']
-        framerate = amass_skeleton[key]['mocap_framerate']
-        skip = int(framerate / target_fr)
-        useful_poses = useful_poses[::skip]
-        real_frame_rate = framerate / skip
-        amass_data = amass2adam(useful_poses)
-        result = whole_body_ik(urdf_path, amass_data)
-        result['real_frame_rate'] = real_frame_rate
-        joblib.dump(result, args.out_dir + "/temp/{}_data.pt".format(key))
-
-    with Pool(15) as p:
-        p.map(process, keys)
-
-    # adam_data = {}
-    # for key in tqdm(amass_skeleton.keys()):
+    # def process(key):
     #     if key in occlusion_keys:
     #         print('occlusion', key)
-    #         continue
-    #     result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
-    #     adam_data[key] = result
-    # joblib.dump(adam_data, "adam_data.pt")
+    #         return
+    #     useful_poses = amass_skeleton[key]['skeleton']
+    #     framerate = amass_skeleton[key]['mocap_framerate']
+    #     skip = int(framerate / target_fr)
+    #     useful_poses = useful_poses[::skip]
+    #     real_frame_rate = framerate / skip
+    #     amass_data = amass2adam(useful_poses)
+    #     result = whole_body_ik(urdf_path, amass_data)
+    #     result['real_frame_rate'] = real_frame_rate
+    #     joblib.dump(result, args.out_dir + "/temp/{}_data.pt".format(key))
+
+    # with Pool(15) as p:
+    #     p.map(process, keys)
+
+    adam_data = {}
+    for key in tqdm(amass_skeleton.keys()):
+        if key in occlusion_keys:
+            print('occlusion', key)
+            continue
+        result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
+        adam_data[key] = result
+    joblib.dump(adam_data, "adam_lite_data.pt")
 
     
 
