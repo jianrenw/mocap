@@ -130,19 +130,19 @@ if __name__ == "__main__":
 
     isaac_data = {}
 
-    # for key in tqdm(adam_poses.keys()):
-    #     adam_pose = adam_poses[key]
-    #     result = adam_to_isaac(adam_pose)
-    #     if result is not None:
-    #         isaac_data[key] = result
+    for key in tqdm(adam_poses.keys()):
+        adam_pose = adam_poses[key]
+        result = adam_to_isaac(adam_pose)
+        if result is not None:
+            isaac_data[key] = result
 
-    # joblib.dump(isaac_data, args.out_dir + "/isaac_adam.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam.pt")
 
     # save one
-    key = list(adam_poses.keys())[10]
-    adam_pose = adam_poses[key]
-    result = adam_to_isaac(adam_pose)
-    joblib.dump(result, args.out_dir + "/{}.pt".format(key))
+    # key = list(adam_poses.keys())[10]
+    # adam_pose = adam_poses[key]
+    # result = adam_to_isaac(adam_pose)
+    # joblib.dump(result, args.out_dir + "/{}.pt".format(key))
 
 
 

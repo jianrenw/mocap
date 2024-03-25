@@ -169,6 +169,18 @@ def whole_body_ik(urdf_path, amass_data):
 
         # p.resetJointState(humanoid, joint_index, ik_solution)
 
+        # ik_solution = np.zeros(num_joints)
+        # ik_solution[:4] = ik_solution_lf[:4]
+        # ik_solution[4] = l_foot_angle[i]
+        # ik_solution[6:10] = ik_solution_rf[6:10]
+        # ik_solution[10] = r_foot_angle[i]
+        # ik_solution[12] = waist_angles[i,0]
+        # ik_solution[13] = waist_angles[i,1]
+        # ik_solution[14] = waist_angles[i,2]
+        # ik_solution[16:20] = ik_solution_lh[15:19]
+        # ik_solution[24:28] = ik_solution_rh[19:23]
+
+        # lite
         ik_solution = np.zeros(num_joints)
         ik_solution[:4] = ik_solution_lf[:4]
         ik_solution[4] = l_foot_angle[i]
@@ -178,7 +190,7 @@ def whole_body_ik(urdf_path, amass_data):
         ik_solution[13] = waist_angles[i,1]
         ik_solution[14] = waist_angles[i,2]
         ik_solution[16:20] = ik_solution_lh[15:19]
-        ik_solution[24:28] = ik_solution_rh[19:23]
+        ik_solution[22:26] = ik_solution_rh[20:24]
 
         restPoses = ik_solution
         init_pose = ik_solution

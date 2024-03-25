@@ -74,20 +74,21 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 # keys = list(adam_poses.keys())
 # key = keys[10]
 key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
-data_path = "{}.pt".format(key)
+data_path = "data/out/{}.pt".format(key)
 adam_pose = joblib.load(data_path)
 # adam_pose = adam_poses[key]
 
 
 root_pos = adam_pose["root_pos"]
 root_rot = adam_pose["root_rot"]
+root_vel = adam_pose["root_vel"]
 dof_pos = adam_pose["dof_pos"]
 body_pos = adam_pose["body_pos"]
 frame_num = len(root_pos)
 
 root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
 joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 23)],axis=2).type(torch.float32)
-print(joint_poses[0])
+print(root_vel[0])
 
 # print(body_pos.shape)
 
@@ -102,8 +103,7 @@ print(joint_poses[0])
 
 
 # Simulate
-for _ in range(100000):
-    i = 0
+for i in range(frame_num):
     gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
     gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
     # draw_reference(gym, viewer, env, body_pos[i])
@@ -111,6 +111,6 @@ for _ in range(100000):
     # # update the viewer
     gym.step_graphics(sim)
     gym.draw_viewer(viewer, sim, True)
-    time.sleep(1)
+    time.sleep(0.1)
     # time.sleep(5000)
     # gym.clear_lines(viewer)
