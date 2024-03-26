@@ -107,15 +107,15 @@ def adam_to_isaac(adam_pose):
 
     result = {
         'body_pos': current_body_pos.numpy(), 
-        'root_pos': root_pos[:-1], 
-        'dof_pos': joint_poses[:-1], 
+        'root_pos': root_pos[1:-1], 
+        'dof_pos': joint_poses[1:-1], 
         'body_rot': current_body_rot.numpy(), 
-        'root_rot': root_rot[:-1], 
+        'root_rot': root_rot[1:-1], 
         'body_vel': body_vel.numpy(), 
         'root_vel': body_vel[:,0,:].numpy(), 
         'body_angular_vel': body_angular_vel.numpy(), 
         'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
-        'dof_vel': dof_vel, 
+        'dof_vel': dof_vel[1:], 
         'dt': dt, 
     }
 
