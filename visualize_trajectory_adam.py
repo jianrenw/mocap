@@ -35,8 +35,10 @@ gym.add_ground(sim, plane_params)
 # add cartpole urdf asset
 # asset_root = "adam"
 # asset_file = "urdf/adam.urdf"
-asset_root = "adam_lite_v2"
-asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
+# asset_root = "adam_lite_v2"
+# asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
+asset_root = "adam_lite"
+asset_file = "urdf/adam_lite.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 rigid_body_dict = gym.get_asset_rigid_body_dict(robot_asset)
@@ -84,12 +86,16 @@ adam_pose = joblib.load(data_path)
 root_pos = adam_pose["root_pos"]
 root_rot = adam_pose["root_rot"]
 root_vel = adam_pose["root_vel"]
+root_angular_vel = adam_pose["root_angular_vel"]
 dof_pos = adam_pose["dof_pos"]
+dof_vel = adam_pose["dof_vel"]
 body_pos = adam_pose["body_pos"]
 frame_num = len(root_pos)
 
-root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
-joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, dof_pos.shape[1])],axis=2).type(torch.float32)
+# root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
+# joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, dof_pos.shape[1])],axis=2).type(torch.float32)
+root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.from_numpy(root_vel), torch.from_numpy(root_angular_vel)], dim=1).type(torch.float32)
+joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.from_numpy(dof_vel)],axis=2).type(torch.float32)
 print(root_vel[0])
 
 # print(body_pos.shape)
