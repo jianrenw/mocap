@@ -169,6 +169,7 @@ def whole_body_ik(urdf_path, amass_data):
 
         # p.resetJointState(humanoid, joint_index, ik_solution)
 
+        # complicated
         # ik_solution = np.zeros(num_joints)
         # ik_solution[:4] = ik_solution_lf[:4]
         # ik_solution[4] = l_foot_angle[i]
@@ -181,6 +182,18 @@ def whole_body_ik(urdf_path, amass_data):
         # ik_solution[24:28] = ik_solution_rh[19:23]
 
         # lite
+        # ik_solution = np.zeros(num_joints)
+        # ik_solution[:4] = ik_solution_lf[:4]
+        # ik_solution[4] = l_foot_angle[i]
+        # ik_solution[6:10] = ik_solution_rf[6:10]
+        # ik_solution[10] = r_foot_angle[i]
+        # ik_solution[12] = waist_angles[i,0]
+        # ik_solution[13] = waist_angles[i,1]
+        # ik_solution[14] = waist_angles[i,2]
+        # ik_solution[16:20] = ik_solution_lh[15:19]
+        # ik_solution[22:26] = ik_solution_rh[20:24]
+
+        # corrected lite
         ik_solution = np.zeros(num_joints)
         ik_solution[:4] = ik_solution_lf[:4]
         ik_solution[4] = l_foot_angle[i]
@@ -190,7 +203,7 @@ def whole_body_ik(urdf_path, amass_data):
         ik_solution[13] = waist_angles[i,1]
         ik_solution[14] = waist_angles[i,2]
         ik_solution[16:20] = ik_solution_lh[15:19]
-        ik_solution[22:26] = ik_solution_rh[20:24]
+        ik_solution[22:26] = ik_solution_rh[19:23]
 
         restPoses = ik_solution
         init_pose = ik_solution
@@ -454,28 +467,28 @@ if __name__ == "__main__":
 
     # load robot to pybullet
     home_dir = os.path.expanduser('~')
-    urdf_path = "{}/mocap/adam_lite_v2/urdf/adam_lite_pybullet.urdf".format(home_dir)
+    urdf_path = "{}/mocap/adam_lite/urdf/adam_lite_pybullet.urdf".format(home_dir)
 
     keys = list(amass_skeleton.keys())
     occlusion_keys = list(amass_occlusion.keys())
     occlusion_keys = [occlusion_key[2:] for occlusion_key in occlusion_keys]
 
-    # def process(key):
-    #     if key in occlusion_keys:
-    #         print('occlusion', key)
-    #         return
-    #     useful_poses = amass_skeleton[key]['skeleton']
-    #     framerate = amass_skeleton[key]['mocap_framerate']
-    #     skip = int(framerate / target_fr)
-    #     useful_poses = useful_poses[::skip]
-    #     real_frame_rate = framerate / skip
-    #     amass_data = amass2adam(useful_poses)
-    #     result = whole_body_ik(urdf_path, amass_data)
-    #     result['real_frame_rate'] = real_frame_rate
-    #     joblib.dump(result, args.out_dir + "/temp/{}_data.pt".format(key))
+    def process(key):
+        if key in occlusion_keys:
+            print('occlusion', key)
+            return
+        useful_poses = amass_skeleton[key]['skeleton']
+        framerate = amass_skeleton[key]['mocap_framerate']
+        skip = int(framerate / target_fr)
+        useful_poses = useful_poses[::skip]
+        real_frame_rate = framerate / skip
+        amass_data = amass2adam(useful_poses)
+        result = whole_body_ik(urdf_path, amass_data)
+        result['real_frame_rate'] = real_frame_rate
+        joblib.dump(result, args.out_dir + "/temp/{}_data.pt".format(key))
 
-    # with Pool(15) as p:
-    #     p.map(process, keys)
+    with Pool(15) as p:
+        p.map(process, keys)
 
     adam_data = {}
     for key in tqdm(amass_skeleton.keys()):
@@ -484,7 +497,7 @@ if __name__ == "__main__":
             continue
         result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
         adam_data[key] = result
-    joblib.dump(adam_data, "adam_lite_data.pt")
+    joblib.dump(adam_data, "adam_lite_corrected_data.pt")
 
     
 
