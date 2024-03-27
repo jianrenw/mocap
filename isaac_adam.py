@@ -40,8 +40,10 @@ gym.add_ground(sim, plane_params)
 # add cartpole urdf asset
 # asset_root = "adam"
 # asset_file = "urdf/adam.urdf"
-asset_root = "adam_lite_v2"
-asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
+# asset_root = "adam_lite_v2"
+# asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
+asset_root = "adam_lite"
+asset_file = "urdf/adam_lite.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 dof_names = gym.get_asset_dof_names(robot_asset)
@@ -133,7 +135,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # load motion data
-    adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
+    adam_poses = joblib.load(args.data_path + "/adam_lite_corrected_data.pt")
 
     isaac_data = {}
 
@@ -143,7 +145,7 @@ if __name__ == "__main__":
         if result is not None:
             isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_corrected.pt")
 
     # save one
     key = list(adam_poses.keys())[10]

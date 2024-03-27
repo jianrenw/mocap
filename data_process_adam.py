@@ -497,7 +497,7 @@ if __name__ == "__main__":
             continue
         result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
         adam_data[key] = result
-    joblib.dump(adam_data, "adam_lite_corrected_data.pt")
+    joblib.dump(adam_data, args.out_dir + "adam_lite_corrected_data.pt")
 
     
 
