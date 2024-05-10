@@ -240,8 +240,8 @@ def amass2h1(skeleton):
     r_foot = skeleton[:,8,:]
     r_toe = skeleton[:,11,:]
 
-    l_elbow_o = skeleton[:,24,:]
-    l_elbow_i = skeleton[:,25,:]
+    l_elbow_i = skeleton[:,24,:]
+    l_elbow_o = skeleton[:,25,:]
     r_elbow_i = skeleton[:,26,:]
     r_elbow_o = skeleton[:,27,:]
 

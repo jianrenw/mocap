@@ -169,7 +169,7 @@ def whole_body_ik(urdf_path, amass_data):
 
         # p.resetJointState(humanoid, joint_index, ik_solution)
 
-        # complicated
+        # adam
         # ik_solution = np.zeros(num_joints)
         # ik_solution[:4] = ik_solution_lf[:4]
         # ik_solution[4] = l_foot_angle[i]
@@ -181,7 +181,7 @@ def whole_body_ik(urdf_path, amass_data):
         # ik_solution[16:20] = ik_solution_lh[15:19]
         # ik_solution[24:28] = ik_solution_rh[19:23]
 
-        # lite
+        # adam lite with wrist
         # ik_solution = np.zeros(num_joints)
         # ik_solution[:4] = ik_solution_lf[:4]
         # ik_solution[4] = l_foot_angle[i]
@@ -193,7 +193,7 @@ def whole_body_ik(urdf_path, amass_data):
         # ik_solution[16:20] = ik_solution_lh[15:19]
         # ik_solution[22:26] = ik_solution_rh[20:24]
 
-        # corrected lite
+        # adam lite
         ik_solution = np.zeros(num_joints)
         ik_solution[:4] = ik_solution_lf[:4]
         ik_solution[4] = l_foot_angle[i]
@@ -467,7 +467,7 @@ if __name__ == "__main__":
 
     # load robot to pybullet
     home_dir = os.path.expanduser('~')
-    urdf_path = "{}/mocap/adam_lite/urdf/adam_lite_pybullet.urdf".format(home_dir)
+    urdf_path = "{}/mocap/robots/adam_lite/urdf/adam_lite_pybullet.urdf".format(home_dir)
 
     keys = list(amass_skeleton.keys())
     occlusion_keys = list(amass_occlusion.keys())
@@ -497,7 +497,7 @@ if __name__ == "__main__":
             continue
         result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
         adam_data[key] = result
-    joblib.dump(adam_data, args.out_dir + "adam_lite_corrected_data.pt")
+    joblib.dump(adam_data, args.out_dir + "adam_lite_data.pt")
 
     
 

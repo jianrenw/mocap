@@ -1,7 +1,7 @@
 import joblib
 
 # load motion data
-data_path = "data/out/isaac_adam.pt"
+data_path = "data/out/isaac_adam_lite.pt"
 adam_poses = joblib.load(data_path)
 keys = list(adam_poses.keys())
 # key = keys[10]

@@ -37,13 +37,14 @@ gym.add_ground(sim, plane_params)
 # asset_file = "urdf/adam.urdf"
 # asset_root = "adam_lite_v2"
 # asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
-asset_root = "adam_lite"
+asset_root = "robots/adam_lite"
 asset_file = "urdf/adam_lite.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 rigid_body_dict = gym.get_asset_rigid_body_dict(robot_asset)
 
 print(rigid_body_names)
+print(len(rigid_body_names))
 print(rigid_body_dict)
 
 spacing = 2.0
@@ -73,14 +74,12 @@ cam_target = gymapi.Vec3(0, 2, 1.5)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-# data_path = "data/out/isaac_adam.pt"
-# adam_poses = joblib.load(data_path)
-# keys = list(adam_poses.keys())
-# key = keys[10]
-key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
-data_path = "data/out/{}.pt".format(key)
-adam_pose = joblib.load(data_path)
-# adam_pose = adam_poses[key]
+data_path = "data/out/isaac_adam_lite.pt"
+# key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
+adam_poses = joblib.load(data_path)
+keys = list(adam_poses.keys())
+key = keys[101]
+adam_pose = adam_poses[key]
 
 
 root_pos = adam_pose["root_pos"]
@@ -98,7 +97,7 @@ root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot),
 joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.from_numpy(dof_vel)],axis=2).type(torch.float32)
 print(root_vel[0])
 
-# print(body_pos.shape)
+print(body_pos.shape)
 
 
 # def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
