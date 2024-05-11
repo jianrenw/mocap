@@ -86,7 +86,7 @@
       link="hipPitchLeft" />
     <axis
       xyz="0 1 0" />
-    <limit effort="230.0" lower="-2.09" upper="2.09" velocity="15.0"/>
+    <limit effort="300.0" lower="-2.09" upper="2.09" velocity="15.0"/>
   </joint>
   <link
     name="hipRollLeft">
@@ -229,7 +229,7 @@
       link="shin_Left" />
     <axis
       xyz="0 1 0" />
-    <limit effort="230.0" lower="-0.09" upper="2.4" velocity="15.0"/>
+    <limit effort="300.0" lower="-0.09" upper="2.4" velocity="15.0"/>
   </joint>
   <link
     name="footLeftY">
@@ -370,7 +370,7 @@
       link="hipPitchRight" />
     <axis
       xyz="0 1 0" />
-    <limit effort="230.0" lower="-2.09" upper="2.09" velocity="15.0"/>
+    <limit effort="300.0" lower="-2.09" upper="2.09" velocity="15.0"/>
   </joint>
   <link
     name="hipRollRight">
@@ -513,7 +513,7 @@
       link="shin_Right" />
     <axis
       xyz="0 1 0" />
-    <limit effort="230.0" lower="-0.09" upper="2.4" velocity="15.0"/>
+    <limit effort="300.0" lower="-0.09" upper="2.4" velocity="15.0"/>
   </joint>
   <link
     name="footRightY">
