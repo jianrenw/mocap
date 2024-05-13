@@ -11,6 +11,7 @@ import sys
 from contextlib import contextmanager
 from multiprocessing import Pool
 import time
+import json
 
 @contextmanager
 def suppress_stdout():
@@ -41,22 +42,22 @@ def whole_body_ik(urdf_path, motion_data):
         humanoid = p.loadURDF(urdf_path, robot_start_pos, robot_start_orientation)
 
     num_frames = motion_data['num_frames']
-    pelvis = amass_data['pelvis']
-    upper_rot = amass_data['upper_rot']
-    lower_rot = amass_data['lower_rot']
-    l_elbow_rot = amass_data['l_elbow_rot']
-    r_elbow_rot = amass_data['r_elbow_rot']
-    l_knee_rot = amass_data['l_knee_rot']
-    r_knee_rot = amass_data['r_knee_rot']
-    l_upperarm_dir = amass_data['l_upperarm_dir']
-    r_upperarm_dir = amass_data['r_upperarm_dir']
-    l_thigh_dir = amass_data['l_thigh_dir']
-    r_thigh_dir = amass_data['r_thigh_dir']
-    waist_angles = amass_data['waist_angles']
-    l_foot_angle = amass_data['l_foot_angle']
-    r_foot_angle = amass_data['r_foot_angle']
-    l_foot_dir = amass_data['l_foot_dir']
-    r_foot_dir = amass_data['r_foot_dir']
+    pelvis = motion_data['pelvis']
+    upper_rot = motion_data['upper_rot']
+    lower_rot = motion_data['lower_rot']
+    l_elbow_rot = motion_data['l_elbow_rot']
+    r_elbow_rot = motion_data['r_elbow_rot']
+    l_knee_rot = motion_data['l_knee_rot']
+    r_knee_rot = motion_data['r_knee_rot']
+    l_upperarm_dir = motion_data['l_upperarm_dir']
+    r_upperarm_dir = motion_data['r_upperarm_dir']
+    l_thigh_dir = motion_data['l_thigh_dir']
+    r_thigh_dir = motion_data['r_thigh_dir']
+    waist_angles = motion_data['waist_angles']
+    l_foot_angle = motion_data['l_foot_angle']
+    r_foot_angle = motion_data['r_foot_angle']
+    l_foot_dir = motion_data['l_foot_dir']
+    r_foot_dir = motion_data['r_foot_dir']
 
     upperarm_len = 0.2648365892539233
     thigh_len = 0.4252746432372357
@@ -228,7 +229,7 @@ def whole_body_ik(urdf_path, motion_data):
         r_toe_pose = np.dot(r_rot_matrix@toe_R, [toe_len, 0, 0]) + r_ankle_pos
         r_heel_pose = np.dot(r_rot_matrix@heel_R, [heel_len, 0, 0]) + r_ankle_pos
 
-        if i < 30:
+        if i < 20:
             current_min = np.min([l_toe_pose[2], r_toe_pose[2], l_heel_pose[2], r_heel_pose[2]])
             if min_foot_z > current_min:
                 min_foot_z = current_min
@@ -251,34 +252,29 @@ def whole_body_ik(urdf_path, motion_data):
 
 
 
-def amass2adam(skeleton):
+def motion2adam(skeleton):
 
     num_frames = skeleton.shape[0]
 
     pelvis = skeleton[:,0,:]
 
-    l_upperarm = skeleton[:,16,:]
-    l_forearm = skeleton[:,18,:]
-    l_hand = skeleton[:,20,:]
+    l_upperarm = skeleton[:,5,:]
+    l_forearm = skeleton[:,6,:]
+    l_hand = skeleton[:,7,:]
 
-    r_upperarm = skeleton[:,17,:]
-    r_forearm = skeleton[:,19,:]
-    r_hand = skeleton[:,21,:]
+    r_upperarm = skeleton[:,12,:]
+    r_forearm = skeleton[:,13,:]
+    r_hand = skeleton[:,14,:]
 
     l_thigh = skeleton[:,1,:]
-    l_calf = skeleton[:,4,:]
-    l_foot = skeleton[:,7,:]
-    l_toe = skeleton[:,10,:]
+    l_calf = skeleton[:,2,:]
+    l_foot = skeleton[:,3,:]
+    l_toe = skeleton[:,4,:]
 
-    r_thigh = skeleton[:,2,:]
-    r_calf = skeleton[:,5,:]
-    r_foot = skeleton[:,8,:]
+    r_thigh = skeleton[:,8,:]
+    r_calf = skeleton[:,9,:]
+    r_foot = skeleton[:,10,:]
     r_toe = skeleton[:,11,:]
-
-    l_elbow_i = skeleton[:,24,:]
-    l_elbow_o = skeleton[:,25,:]
-    r_elbow_i = skeleton[:,26,:]
-    r_elbow_o = skeleton[:,27,:]
 
     # upper body
     head = (l_upperarm + r_upperarm) / 2
@@ -301,10 +297,6 @@ def amass2adam(skeleton):
     l_elbow_rot_z = l_elbow_rot_z / np.linalg.norm(
         l_elbow_rot_z, axis=1, keepdims=True
     )
-    l_elbow_rot_y_1 = l_elbow_i - l_elbow_o
-    l_elbow_rot_y_1 = l_elbow_rot_y_1 / np.linalg.norm(
-        l_elbow_rot_y_1, axis=1, keepdims=True
-    )
     l_elbow_rot_y_2 = l_upperarm - l_forearm
     l_elbow_rot_y_2 = l_elbow_rot_y_2 / np.linalg.norm(
         l_elbow_rot_y_2, axis=1, keepdims=True
@@ -313,8 +305,6 @@ def amass2adam(skeleton):
     l_elbow_rot_y_2 = l_elbow_rot_y_2 / np.linalg.norm(
         l_elbow_rot_y_2, axis=1, keepdims=True
     )
-    correction = np.einsum('ij,ij->i', l_elbow_rot_y_1, l_elbow_rot_y_2) < 0
-    l_elbow_rot_y_2[correction] = -l_elbow_rot_y_2[correction]
 
     l_elbow_rot_x = np.cross(l_elbow_rot_y_2, l_elbow_rot_z)
     l_elbow_rot_x = l_elbow_rot_x / np.linalg.norm(
@@ -333,10 +323,6 @@ def amass2adam(skeleton):
     r_elbow_rot_z = r_elbow_rot_z / np.linalg.norm(
         r_elbow_rot_z, axis=1, keepdims=True
     )
-    r_elbow_rot_y_1 = r_elbow_i - r_elbow_o
-    r_elbow_rot_y_1 = r_elbow_rot_y_1 / np.linalg.norm(
-        r_elbow_rot_y_1, axis=1, keepdims=True
-    )
     r_elbow_rot_y_2 = r_upperarm - r_forearm
     r_elbow_rot_y_2 = r_elbow_rot_y_2 / np.linalg.norm(
         r_elbow_rot_y_2, axis=1, keepdims=True
@@ -345,8 +331,6 @@ def amass2adam(skeleton):
     r_elbow_rot_y_2 = r_elbow_rot_y_2 / np.linalg.norm(
         r_elbow_rot_y_2, axis=1, keepdims=True
     )
-    correction = np.einsum('ij,ij->i', r_elbow_rot_y_1, r_elbow_rot_y_2) < 0
-    r_elbow_rot_y_2[correction] = -r_elbow_rot_y_2[correction]
 
     r_elbow_rot_x = np.cross(r_elbow_rot_y_2, r_elbow_rot_z)
     r_elbow_rot_x = r_elbow_rot_x / np.linalg.norm(
@@ -411,7 +395,6 @@ def amass2adam(skeleton):
     cos = np.einsum('ij,ij->i', r_calf_dir, r_foot_dir) / (np.linalg.norm(r_calf_dir, axis=1) * np.linalg.norm(r_foot_dir, axis=1))
     r_foot_angle = np.arccos(cos) - np.arctan(0.047/0.160) - np.pi/2
 
-
     # to pybullet
     upper_rot = R.from_matrix(upper_rot)
     lower_rot = R.from_matrix(lower_rot)
@@ -452,52 +435,28 @@ def amass2adam(skeleton):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jwang/mocap/data/out"
+        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/parkour/motions"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jwang/mocap/data/out"
+        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/parkour/joints"
     )
 
     args = parser.parse_args()
 
     target_fr = 50
-    amass_skeleton = joblib.load(args.data_path + "/amass.pt")
-    amass_occlusion = joblib.load(args.data_path + "/amass_occlusion.pkl")
-
 
     # load robot to pybullet
     home_dir = os.path.expanduser('~')
     urdf_path = "{}/mocap/robots/adam_lite/urdf/adam_lite_pybullet.urdf".format(home_dir)
 
-    keys = list(amass_skeleton.keys())
-    occlusion_keys = list(amass_occlusion.keys())
-    occlusion_keys = [occlusion_key[2:] for occlusion_key in occlusion_keys]
-
-    def process(key):
-        if key in occlusion_keys:
-            print('occlusion', key)
-            return
-        useful_poses = amass_skeleton[key]['skeleton']
-        framerate = amass_skeleton[key]['mocap_framerate']
-        skip = int(framerate / target_fr)
-        useful_poses = useful_poses[::skip]
-        real_frame_rate = framerate / skip
-        amass_data = amass2adam(useful_poses)
-        result = whole_body_ik(urdf_path, amass_data)
-        result['real_frame_rate'] = real_frame_rate
-        joblib.dump(result, args.out_dir + "/temp/{}_data.pt".format(key))
-
-    with Pool(15) as p:
-        p.map(process, keys)
-
-    adam_data = {}
-    for key in tqdm(amass_skeleton.keys()):
-        if key in occlusion_keys:
-            print('occlusion', key)
-            continue
-        result = joblib.load(args.out_dir + "/temp/{}_data.pt".format(key))
-        adam_data[key] = result
-    joblib.dump(adam_data, args.out_dir + "adam_lite_data.pt")
+    motions = os.listdir(args.data_path)
+    for motion in motions:
+        print(args.data_path + "/{}".format(motion))
+        skeleton = np.load(args.data_path + "/{}".format(motion))
+        motion_data = motion2adam(skeleton)
+        result = whole_body_ik(urdf_path, motion_data)
+        result['real_frame_rate'] = 60
+        joblib.dump(result, args.out_dir + "/{}.pt".format(motion[:-4]))
 
     
 

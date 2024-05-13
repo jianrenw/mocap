@@ -42,7 +42,7 @@ gym.add_ground(sim, plane_params)
 # asset_file = "urdf/adam.urdf"
 # asset_root = "adam_lite_v2"
 # asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
-asset_root = "adam_lite"
+asset_root = "robots/adam_lite"
 asset_file = "urdf/adam_lite.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
@@ -126,33 +126,39 @@ def adam_to_isaac(adam_pose):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/out"
+        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/parkour/joints"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/out"
+        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/parkour/isaac"
     )
 
     args = parser.parse_args()
 
     # load motion data
-    adam_poses = joblib.load(args.data_path + "/adam_lite_corrected_data.pt")
+    # adam_poses = joblib.load(args.data_path + "/adam_lite_corrected_data.pt")
 
-    isaac_data = {}
+    # isaac_data = {}
 
-    for key in tqdm(adam_poses.keys()):
-        adam_pose = adam_poses[key]
+    # for key in tqdm(adam_poses.keys()):
+    #     adam_pose = adam_poses[key]
+    #     result = adam_to_isaac(adam_pose)
+    #     if result is not None:
+    #         isaac_data[key] = result
+
+    # joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_corrected.pt")
+
+    # # save one
+    # key = list(adam_poses.keys())[10]
+    # adam_pose = adam_poses[key]
+    # result = adam_to_isaac(adam_pose)
+    # joblib.dump(result, args.out_dir + "/{}.pt".format(key))
+
+    motions = os.listdir(args.data_path)
+    for motion in motions:
+        print(args.data_path + "/{}".format(motion))
+        adam_pose = joblib.load(args.data_path + "/{}".format(motion))
         result = adam_to_isaac(adam_pose)
-        if result is not None:
-            isaac_data[key] = result
-
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_corrected.pt")
-
-    # save one
-    key = list(adam_poses.keys())[10]
-    adam_pose = adam_poses[key]
-    result = adam_to_isaac(adam_pose)
-    joblib.dump(result, args.out_dir + "/{}.pt".format(key))
-
+        joblib.dump(result, args.out_dir + "/{}.pt".format(motion[:-3]))
 
 
 
