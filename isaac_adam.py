@@ -103,9 +103,13 @@ def adam_to_isaac(adam_pose):
     dof_vel = joint_poses[1:] - joint_poses[:-1]
     dof_vel = dof_vel / dt
 
+    # diff_global_body_rot = torch_utils.quat_mul(next_body_rot, torch_utils.quat_conjugate(current_body_rot))
+    # diff_global_body_angle, diff_global_body_axis = torch_utils.quat_to_angle_axis(diff_global_body_rot)   
+    # body_angular_vel = diff_global_body_angle[:,:,None] * diff_global_body_axis / dt
+
     diff_global_body_rot = torch_utils.quat_mul(next_body_rot, torch_utils.quat_conjugate(current_body_rot))
-    diff_global_body_angle, diff_global_body_axis = torch_utils.quat_to_angle_axis(diff_global_body_rot)   
-    body_angular_vel = diff_global_body_angle[:,:,None] * diff_global_body_axis / dt
+    len_traj = diff_global_body_rot.shape[0]
+    euler_from_quat = torch_utils.euler_from_quat(diff_global_body_rot.reshape(-1, 4)).reshape(len_traj, -1, 3) / dt
 
     result = {
         'body_pos': current_body_pos.numpy(), 
@@ -115,8 +119,10 @@ def adam_to_isaac(adam_pose):
         'root_rot': root_rot[1:-1], 
         'body_vel': body_vel.numpy(), 
         'root_vel': body_vel[:,0,:].numpy(), 
-        'body_angular_vel': body_angular_vel.numpy(), 
-        'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
+        # 'body_angular_vel': body_angular_vel.numpy(), 
+        # 'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
+        'body_angular_vel': euler_from_quat.numpy(), 
+        'root_angular_vel': euler_from_quat[:,0,:].numpy(), 
         'dof_vel': dof_vel[1:], 
         'dt': dt, 
     }
@@ -126,26 +132,26 @@ def adam_to_isaac(adam_pose):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/parkour/joints"
+        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/out"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/parkour/isaac"
+        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/out"
     )
 
     args = parser.parse_args()
 
     # load motion data
-    # adam_poses = joblib.load(args.data_path + "/adam_lite_corrected_data.pt")
+    adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
 
-    # isaac_data = {}
+    isaac_data = {}
 
-    # for key in tqdm(adam_poses.keys()):
-    #     adam_pose = adam_poses[key]
-    #     result = adam_to_isaac(adam_pose)
-    #     if result is not None:
-    #         isaac_data[key] = result
+    for key in tqdm(adam_poses.keys()):
+        adam_pose = adam_poses[key]
+        result = adam_to_isaac(adam_pose)
+        if result is not None:
+            isaac_data[key] = result
 
-    # joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_corrected.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_rpy.pt")
 
     # # save one
     # key = list(adam_poses.keys())[10]
@@ -153,12 +159,12 @@ if __name__ == "__main__":
     # result = adam_to_isaac(adam_pose)
     # joblib.dump(result, args.out_dir + "/{}.pt".format(key))
 
-    motions = os.listdir(args.data_path)
-    for motion in motions:
-        print(args.data_path + "/{}".format(motion))
-        adam_pose = joblib.load(args.data_path + "/{}".format(motion))
-        result = adam_to_isaac(adam_pose)
-        joblib.dump(result, args.out_dir + "/{}.pt".format(motion[:-3]))
+    # motions = os.listdir(args.data_path)
+    # for motion in motions:
+    #     print(args.data_path + "/{}".format(motion))
+    #     adam_pose = joblib.load(args.data_path + "/{}".format(motion))
+    #     result = adam_to_isaac(adam_pose)
+    #     joblib.dump(result, args.out_dir + "/{}.pt".format(motion[:-3]))
 
 
 

@@ -78,6 +78,32 @@ def quat_to_angle_axis(q):
     return angle, axis
 
 @torch.jit.script
+def euler_from_quat(q):
+    """
+    Convert a quaternion into euler angles (roll, pitch, yaw)
+    roll is rotation around x in radians (counterclockwise)
+    pitch is rotation around y in radians (counterclockwise)
+    yaw is rotation around z in radians (counterclockwise)
+    """
+    x = q[:,0]
+    y = q[:,1]
+    z = q[:,2]
+    w = q[:,3]
+    t0 = 2.0 * (w * x + y * z)
+    t1 = 1.0 - 2.0 * (x * x + y * y)
+    roll_x = torch.atan2(t0, t1)
+    
+    t2 = 2.0 * (w * y - z * x)
+    t2 = torch.clip(t2, -1, 1)
+    pitch_y = torch.asin(t2)
+    
+    t3 = 2.0 * (w * z + x * y)
+    t4 = 1.0 - 2.0 * (y * y + z * z)
+    yaw_z = torch.atan2(t3, t4)
+    
+    return torch.stack([roll_x, pitch_y, yaw_z], dim=-1) # in radians
+
+@torch.jit.script
 def angle_axis_to_exp_map(angle, axis):
     # type: (Tensor, Tensor) -> Tensor
     # compute exponential map from axis-angle
