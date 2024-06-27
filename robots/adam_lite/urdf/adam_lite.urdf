@@ -1056,6 +1056,36 @@
       xyz="0 0 1" />
   </joint>
   <link
+    name="wristLeft">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.035"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="wrist_Left"
+    type="revolute">
+    <origin
+      xyz="-0.0150000000000083 0.0285000000000339 -0.3034000000000177"
+      rpy="0 0 0" />
+    <parent
+      link="elbowLeft" />
+    <child
+      link="wristLeft" />
+    <axis
+      xyz="0 0 1" />
+    <limit effort="30.0" lower="-3.14" upper="3.14" velocity="8.0"/>
+  </joint>
+  <link
     name="shoulderBaseRight">
     <inertial>
       <origin
@@ -1354,5 +1384,35 @@
       link="wristYawRight" />
     <axis
       xyz="0 0 1" />
+  </joint>
+  <link
+    name="wristRight">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.035"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="wrist_Right"
+    type="revolute">
+    <origin
+      xyz="-0.0149999999999991 -0.0285000000000092 -0.3033999999999902"
+      rpy="0 0 0" />
+    <parent
+      link="elbowRight" />
+    <child
+      link="wristRight" />
+    <axis
+      xyz="0 0 1" />
+    <limit effort="30.0" lower="-3.14" upper="3.14" velocity="8.0"/>
   </joint>
 </robot>

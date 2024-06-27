@@ -48,6 +48,11 @@ robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 dof_names = gym.get_asset_dof_names(robot_asset)
 
+real_dof_idx = []
+for i, dof_name in enumerate(dof_names):
+    if 'wrist' not in dof_name:
+        real_dof_idx.append(i)
+
 spacing = 2.0
 lower = gymapi.Vec3(-spacing, -spacing, -spacing)
 upper = gymapi.Vec3(spacing, spacing, spacing)
@@ -66,16 +71,19 @@ def adam_to_isaac(adam_pose):
     root_rot = adam_pose["root_rot"]
     joint_poses = adam_pose["joint_poses"]
     joint_names = adam_pose["joint_names"]
-    useful_list = [joint_names.index(name) for name in dof_names]
+    useful_list = [joint_names.index(name) for name in dof_names if 'wrist' not in name]
     joint_poses = joint_poses[:, useful_list]
     
     frame_num = len(root_pos)
 
     if frame_num <= 2:
         return None
+    
+    # import ipdb; ipdb.set_trace()
 
     root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
-    dof_states = torch.stack([torch.from_numpy(joint_poses), torch.zeros(frame_num, len(dof_names))],axis=2).type(torch.float32)
+    dof_states = torch.zeros(frame_num, len(dof_names), 2).type(torch.float32)
+    dof_states[:, real_dof_idx] = torch.stack([torch.from_numpy(joint_poses), torch.zeros(frame_num, len(real_dof_idx))],axis=2).type(torch.float32)
     rigid_body_states = []
 
     # Simulate
@@ -100,7 +108,9 @@ def adam_to_isaac(adam_pose):
     body_vel = next_body_pos - current_body_pos
     body_vel = body_vel / dt
 
-    dof_vel = joint_poses[1:] - joint_poses[:-1]
+    # dof_vel = joint_poses[1:] - joint_poses[:-1]
+    dof_states = dof_states.numpy()
+    dof_vel = dof_states[1:,:,0] - dof_states[:-1,:,0]
     dof_vel = dof_vel / dt
 
     # diff_global_body_rot = torch_utils.quat_mul(next_body_rot, torch_utils.quat_conjugate(current_body_rot))
@@ -114,7 +124,8 @@ def adam_to_isaac(adam_pose):
     result = {
         'body_pos': current_body_pos.numpy(), 
         'root_pos': root_pos[1:-1], 
-        'dof_pos': joint_poses[1:-1], 
+        # 'dof_pos': joint_poses[1:-1], 
+        'dof_pos': dof_states[1:-1,:,0], 
         'body_rot': current_body_rot.numpy(), 
         'root_rot': root_rot[1:-1], 
         'body_vel': body_vel.numpy(), 
@@ -151,7 +162,7 @@ if __name__ == "__main__":
         if result is not None:
             isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_rpy.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_add_wrist.pt")
 
     # # save one
     # key = list(adam_poses.keys())[10]

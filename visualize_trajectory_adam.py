@@ -74,7 +74,7 @@ cam_target = gymapi.Vec3(0, 2, 1.5)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-data_path = "data/out/isaac_adam_lite_rpy.pt"
+data_path = "data/out/isaac_adam_lite_add_wrist.pt"
 key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
 adam_poses = joblib.load(data_path)
 keys = list(adam_poses.keys())
@@ -100,20 +100,20 @@ print(root_vel[0])
 print(body_pos.shape)
 
 
-# def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
-#     track_link = [rigid_body_names.index('footLeftY'), rigid_body_names.index('footRightY'), rigid_body_names.index('wristRollLeft'), rigid_body_names.index('wristRollRight')]
-#     updated_body_pos = body_pos[track_link]
-#     for ubp in updated_body_pos:
-#         sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)
-#         sphere_geom = gymutil.WireframeSphereGeometry(radius, 10, 10, None, color=(1, 0, 0))
-#         gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
+def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
+    track_link = [rigid_body_names.index('footLeftY'), rigid_body_names.index('footRightY'), rigid_body_names.index('wristLeft'), rigid_body_names.index('wristRight')]
+    updated_body_pos = body_pos[track_link]
+    for ubp in updated_body_pos:
+        sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)
+        sphere_geom = gymutil.WireframeSphereGeometry(radius, 10, 10, None, color=(1, 0, 0))
+        gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
 
 
 # Simulate
 for i in range(frame_num):
     gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
     gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
-    # draw_reference(gym, viewer, env, body_pos[i])
+    draw_reference(gym, viewer, env, body_pos[i])
 
     # # update the viewer
     gym.step_graphics(sim)
