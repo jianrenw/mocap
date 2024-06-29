@@ -47,6 +47,8 @@ asset_file = "urdf/adam_lite.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 dof_names = gym.get_asset_dof_names(robot_asset)
+print(rigid_body_names)
+print(dof_names)
 
 real_dof_idx = []
 for i, dof_name in enumerate(dof_names):
@@ -71,7 +73,7 @@ def adam_to_isaac(adam_pose):
     root_rot = adam_pose["root_rot"]
     joint_poses = adam_pose["joint_poses"]
     joint_names = adam_pose["joint_names"]
-    useful_list = [joint_names.index(name) for name in dof_names if 'wrist' not in name]
+    useful_list = [joint_names.index(name) for name in dof_names]
     joint_poses = joint_poses[:, useful_list]
     
     frame_num = len(root_pos)
