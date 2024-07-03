@@ -37,8 +37,10 @@ gym.add_ground(sim, plane_params)
 # asset_file = "urdf/adam.urdf"
 # asset_root = "adam_lite_v2"
 # asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
-asset_root = "robots/adam_lite"
-asset_file = "urdf/adam_lite.urdf"
+# asset_root = "robots/adam_lite"
+# asset_file = "urdf/adam_lite.urdf"
+asset_root = "robots/adam_standard"
+asset_file = "urdf/adam_standard.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 rigid_body_dict = gym.get_asset_rigid_body_dict(robot_asset)
@@ -74,7 +76,7 @@ cam_target = gymapi.Vec3(0, 2, 1.5)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-data_path = "data/out/isaac_adam_lite_add_wrist.pt"
+data_path = "data/out/isaac_adam_standard.pt"
 key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
 adam_poses = joblib.load(data_path)
 keys = list(adam_poses.keys())
@@ -101,7 +103,7 @@ print(body_pos.shape)
 
 
 def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
-    track_link = [rigid_body_names.index('footLeftY'), rigid_body_names.index('footRightY'), rigid_body_names.index('wristLeft'), rigid_body_names.index('wristRight')]
+    track_link = [rigid_body_names.index('anklePitchLeft'), rigid_body_names.index('anklePitchRight'), rigid_body_names.index('wristPitchLeft'), rigid_body_names.index('wristPitchRight')]
     updated_body_pos = body_pos[track_link]
     for ubp in updated_body_pos:
         sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)

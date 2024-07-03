@@ -42,8 +42,8 @@ gym.add_ground(sim, plane_params)
 # asset_file = "urdf/adam.urdf"
 # asset_root = "adam_lite_v2"
 # asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
-asset_root = "robots/adam_lite"
-asset_file = "urdf/adam_lite.urdf"
+asset_root = "robots/adam_standard"
+asset_file = "urdf/adam_standard.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 dof_names = gym.get_asset_dof_names(robot_asset)
@@ -52,7 +52,7 @@ print(dof_names)
 
 real_dof_idx = []
 for i, dof_name in enumerate(dof_names):
-    if 'wrist' not in dof_name:
+    if 'wrist' not in dof_name and 'gripper' not in dof_name:
         real_dof_idx.append(i)
 
 spacing = 2.0
@@ -164,7 +164,7 @@ if __name__ == "__main__":
         if result is not None:
             isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_lite_add_wrist.pt")
+    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_standard.pt")
 
     # # save one
     # key = list(adam_poses.keys())[10]

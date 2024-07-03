@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.1" encoding="utf-8"?>
 <!-- =================================================================================== -->
 <!--   Copyright 2024 PNDbotics, https://www.pndbotics.com/                              -->
 <!-- =================================================================================== -->
@@ -9,17 +9,17 @@
     name="pelvis">
     <inertial>
       <origin
-        xyz="0.000083 0.0 -0.001091"
+        xyz="-0.00120281  -0.00000119 -0.00802155"
         rpy="0 0 0" />
       <mass
-        value="9.240301" />
+        value="10.18730021" />
       <inertia
-        ixx="0.054213"
-        ixy="0.000005"
-        ixz="0.000024"
-        iyy="0.027698"
-        iyz="0.000000"
-        izz="0.058691" />
+        ixx="0.06839529"
+        ixy="-0.00000995"
+        ixz="-0.00004308"
+        iyy="0.03753230"
+        iyz="-0.00000105"
+        izz="0.07519708" />
     </inertial>
     <visual>
       <origin
@@ -32,7 +32,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -48,17 +48,17 @@
     name="hipPitchLeft">
     <inertial>
       <origin
-        xyz="-0.060710 0.058995 -0.000274"
+        xyz="-0.05818187 0.05889478 -0.00031205"
         rpy="0 0 0" />
       <mass
-        value="2.122960" />
+        value="2.15124786" />
       <inertia
-        ixx="0.003430"
-        ixy="-0.000980"
-        ixz="-0.000017"
-        iyy="0.004095"
-        iyz="0.000026"
-        izz="0.004706" />
+        ixx="0.00385847"
+        ixy="-0.00094455"
+        ixz="0.00002598"
+        iyy="0.00440973"
+        iyz="0.00002828"
+        izz="0.00508085" />
     </inertial>
     <visual>
       <origin
@@ -71,7 +71,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -79,7 +79,7 @@
     name="hipPitch_Left"
     type="revolute">
     <origin
-      xyz="0 0.096102 -0.027011"
+      xyz="0 0.096192 -0.033241"
       rpy="-0.61087 0 0" />
     <parent
       link="pelvis" />
@@ -87,23 +87,23 @@
       link="hipPitchLeft" />
     <axis
       xyz="0 1 0" />
-    <limit effort="300.0" lower="-2.09" upper="2.09" velocity="15.0"/>
+    <limit effort="230.0" lower="-2.09" upper="2.09" velocity="15.0"/>
   </joint>
   <link
     name="hipRollLeft">
     <inertial>
       <origin
-        xyz="0.039593 -0.000453 -0.010045"
+        xyz="0.03995412 -0.00011618 -0.01102103"
         rpy="0 0 0" />
       <mass
-        value="1.302398" />
+        value="1.29421887" />
       <inertia
-        ixx="0.001122"
-        ixy="-0.000001"
-        ixz="-0.000076"
-        iyy="0.001194"
-        iyz="-0.000015"
-        izz="0.001338" />
+        ixx="0.00134168"
+        ixy="-0.00000431"
+        ixz="-0.00006007"
+        iyy="0.00137070"
+        iyz="-0.00001695"
+        izz="0.00144577" />
     </inertial>
     <visual>
       <origin
@@ -116,7 +116,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -135,20 +135,20 @@
     <limit effort="160.0" lower="-0.78" upper="1.57" velocity="8.0"/>
   </joint>
   <link
-    name="thigh_Left">
+    name="thighLeft">
     <inertial>
       <origin
-        xyz="0.003802 -0.008180 -0.130931"
+        xyz="0.00331195 -0.01112470 -0.13519832"
         rpy="0 0 0" />
       <mass
-        value="6.098905" />
+        value="6.64749717" />
       <inertia
-        ixx="0.051840"
-        ixy="-0.000234"
-        ixz="-0.000840"
-        iyy="0.057183"
-        iyz="0.005427"
-        izz="0.012216" />
+        ixx="0.05688222"
+        ixy="-0.00031813"
+        ixz="-0.00156531"
+        iyy="0.06217155"
+        iyz="0.00531838"
+        izz="0.01520394" />
     </inertial>
     <visual>
       <origin
@@ -156,12 +156,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/thigh_Left.STL" />
+          filename="../meshes/thighLeft.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -174,26 +174,26 @@
     <parent
       link="hipRollLeft" />
     <child
-      link="thigh_Left" />
+      link="thighLeft" />
     <axis
       xyz="0 0 1" />
     <limit effort="105" lower="-0.78" upper="0.78" velocity="8.0"/>
   </joint>
   <link
-    name="shin_Left">
+    name="shinLeft">
     <inertial>
       <origin
-        xyz="0.000004 0.000631 -0.145751"
+        xyz="-0.00080913 0.00097265 -0.14540818"
         rpy="0 0 0" />
       <mass
-        value="2.240625" />
+        value="2.19866469" />
       <inertia
-        ixx="0.023481"
-        ixy="-0.000020"
-        ixz="0.000210"
-        iyy="0.023543"
-        iyz="0.000576"
-        izz="0.001345" />
+        ixx="0.01932815"
+        ixy="-0.00001127"
+        ixz="0.00022012"
+        iyy="0.01940985"
+        iyz="0.00008606"
+        izz="0.00136828" />
     </inertial>
     <visual>
       <origin
@@ -201,12 +201,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/shin_Left.STL" />
+          filename="../meshes/shinLeft.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -225,28 +225,28 @@
       xyz="0 -0.0355 -0.369"
       rpy="0 0 0" />
     <parent
-      link="thigh_Left" />
+      link="thighLeft" />
     <child
-      link="shin_Left" />
+      link="shinLeft" />
     <axis
       xyz="0 1 0" />
-    <limit effort="300.0" lower="-0.09" upper="2.4" velocity="15.0"/>
+    <limit effort="230.0" lower="-0.09" upper="2.4" velocity="15.0"/>
   </joint>
   <link
-    name="footLeftY">
+    name="anklePitchLeft">
     <inertial>
       <origin
-        xyz="0 0 0"
+        xyz="0.00000000 0.00000000 0.00000000"
         rpy="0 0 0" />
       <mass
-        value="0.052131" />
+        value="0.03100000" />
       <inertia
-        ixx="0.000005"
-        ixy="0"
-        ixz="0"
-        iyy="0.000005"
-        iyz="0"
-        izz="0.000004" />
+        ixx="0.00000323"
+        ixy="0.00000000"
+        ixz="0.00000000"
+        iyy="0.00000323"
+        iyz="0.00000000"
+        izz="0.00000210" />
     </inertial>
     <visual>
       <origin
@@ -254,12 +254,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/footLeftY.STL" />
+          filename="../meshes/anklePitchLeft.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.529411764705882 0.549019607843137 0.549019607843137 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -270,28 +270,28 @@
       xyz="0 0 -0.37"
       rpy="0 0 0" />
     <parent
-      link="shin_Left" />
+      link="shinLeft" />
     <child
-      link="footLeftY" />
+      link="anklePitchLeft" />
     <axis
       xyz="0 1 0" />
     <limit effort="40.0" lower="-1.0" upper="0.35" velocity="20.0"/>
   </joint>
   <link
-    name="toe_left">
+    name="toeLeft">
     <inertial>
       <origin
-        xyz="0.052656 0.117093 -0.900329"
+        xyz="0.03700657 -0.00002063 -0.04198684"
         rpy="0 0 0" />
       <mass
-        value="0.436113" />
+        value="0.47580000" />
       <inertia
-        ixx="0.000297"
-        ixy="0.000013"
-        ixz="-0.000137"
-        iyy="0.001513"
-        iyz="0.000001"
-        izz="0.001542" />
+        ixx="0.00028492"
+        ixy="0.00001326"
+        ixz="-0.00012023"
+        iyy="0.00152181"
+        iyz="0.00000143"
+        izz="0.00158187" />
     </inertial>
     <visual>
       <origin
@@ -299,7 +299,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/toe_Left.STL" />
+          filename="../meshes/toeLeft.STL" />
       </geometry>
       <material
         name="">
@@ -321,9 +321,9 @@
       xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="footLeftY" />
+      link="anklePitchLeft" />
     <child
-      link="toe_left" />
+      link="toeLeft" />
     <axis
       xyz="1 0 0" />
     <limit effort="12.0" lower="-0.3491" upper="0.3491" velocity="20.0"/>
@@ -332,17 +332,17 @@
     name="hipPitchRight">
     <inertial>
       <origin
-        xyz="-0.060710 -0.058995 -0.000274"
+        xyz="-0.05818164 -0.05886958 -0.00032981"
         rpy="0 0 0" />
       <mass
-        value="2.122960" />
+        value="2.15124254" />
       <inertia
-        ixx="0.003430"
-        ixy="0.000980"
-        ixz="-0.000017"
-        iyy="0.004095"
-        iyz="-0.000026"
-        izz="0.004706" />
+        ixx="0.00385735"
+        ixy="0.00094210"
+        ixz="0.00002770"
+        iyy="0.00440670"
+        iyz="-0.00002677"
+        izz="0.00508280" />
     </inertial>
     <visual>
       <origin
@@ -355,7 +355,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -363,7 +363,7 @@
     name="hipPitch_Right"
     type="revolute">
     <origin
-      xyz="0 -0.096102 -0.027011"
+      xyz="0 -0.096192 -0.033241"
       rpy="0.61087 0 0" />
     <parent
       link="pelvis" />
@@ -371,23 +371,23 @@
       link="hipPitchRight" />
     <axis
       xyz="0 1 0" />
-    <limit effort="300.0" lower="-2.09" upper="2.09" velocity="15.0"/>
+    <limit effort="230.0" lower="-2.09" upper="2.09" velocity="15.0"/>
   </joint>
   <link
     name="hipRollRight">
     <inertial>
       <origin
-        xyz="0.039593 0.000453 -0.010045"
+        xyz="0.03988167 0.00011594 -0.01102087"
         rpy="0 0 0" />
       <mass
-        value="1.302398" />
+        value="1.29422777" />
       <inertia
-        ixx="0.001122"
-        ixy="0.000001"
-        ixz="-0.000076"
-        iyy="0.001194"
-        iyz="0.000015"
-        izz="0.001338" />
+        ixx="0.00134170"
+        ixy="0.00000379"
+        ixz="-0.00006269"
+        iyy="0.00136997"
+        iyz="0.00001693"
+        izz="0.00144502" />
     </inertial>
     <visual>
       <origin
@@ -400,7 +400,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -419,65 +419,20 @@
     <limit effort="160.0" lower="-1.57" upper="0.78" velocity="8.0"/>
   </joint>
   <link
-    name="thigh_Right">
+    name="thighRight">
     <inertial>
       <origin
-        xyz="0.003802 0.008180 -0.130931"
+        xyz="0.00332701 0.01110269 -0.13528959"
         rpy="0 0 0" />
       <mass
-        value="6.098905" />
+        value="6.64754534" />
       <inertia
-        ixx="0.051840"
-        ixy="0.000234"
-        ixz="-0.000840"
-        iyy="0.057183"
-        iyz="-0.005427"
-        izz="0.012216" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 -0.003 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/thigh_Right.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-  </link>
-  <joint
-    name="hipYaw_Right"
-    type="revolute">
-    <origin
-      xyz="0.044 0.0 -0.0525"
-      rpy="0 0 0" />
-    <parent
-      link="hipRollRight" />
-    <child
-      link="thigh_Right" />
-    <axis
-      xyz="0 0 1" />
-    <limit effort="105" lower="-0.78" upper="0.78" velocity="8.0"/>
-  </joint>
-  <link
-    name="shin_Right">
-    <inertial>
-      <origin
-        xyz="0.000004 -0.000631 -0.145751"
-        rpy="0 0 0" />
-      <mass
-        value="2.240625" />
-      <inertia
-        ixx="0.023481"
-        ixy="0.000020"
-        ixz="0.000210"
-        iyy="0.023543"
-        iyz="-0.000576"
-        izz="0.001345" />
+        ixx="0.05714386"
+        ixy="0.00030277"
+        ixz="-0.00153883"
+        iyy="0.06243248"
+        iyz="-0.00531134"
+        izz="0.01517531" />
     </inertial>
     <visual>
       <origin
@@ -485,12 +440,57 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/shin_Right.STL" />
+          filename="../meshes/thighRight.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+  </link>
+  <joint
+    name="hipYaw_Right"
+    type="revolute">
+    <origin
+      xyz="0.044 0 -0.0525"
+      rpy="0 0 0" />
+    <parent
+      link="hipRollRight" />
+    <child
+      link="thighRight" />
+    <axis
+      xyz="0 0 1" />
+    <limit effort="105" lower="-0.78" upper="0.78" velocity="8.0"/>
+  </joint>
+  <link
+    name="shinRight">
+    <inertial>
+      <origin
+        xyz="-0.00079979 -0.00097288 -0.14635087"
+        rpy="0 0 0" />
+      <mass
+        value="2.20809154" />
+      <inertia
+        ixx="0.01979830"
+        ixy="0.00001096"
+        ixz="0.00021758"
+        iyy="0.01987660"
+        iyz="-0.00009064"
+        izz="0.00137192" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../meshes/shinRight.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -509,28 +509,28 @@
       xyz="0 0.0355 -0.369"
       rpy="0 0 0" />
     <parent
-      link="thigh_Right" />
+      link="thighRight" />
     <child
-      link="shin_Right" />
+      link="shinRight" />
     <axis
       xyz="0 1 0" />
-    <limit effort="300.0" lower="-0.09" upper="2.4" velocity="15.0"/>
+    <limit effort="230.0" lower="-0.09" upper="2.4" velocity="15.0"/>
   </joint>
   <link
-    name="footRightY">
+    name="anklePitchRight">
     <inertial>
       <origin
-        xyz="0 0 0"
+        xyz="0.00000000 0.00000000 0.00000000"
         rpy="0 0 0" />
       <mass
-        value="0.052131" />
+        value="0.03100000" />
       <inertia
-        ixx="0.000005"
-        ixy="0"
-        ixz="0"
-        iyy="0.000005"
-        iyz="0"
-        izz="0.000004" />
+        ixx="0.00000323"
+        ixy="0.00000000"
+        ixz="0.00000000"
+        iyy="0.00000323"
+        iyz="0.00000000"
+        izz="0.00000210" />
     </inertial>
     <visual>
       <origin
@@ -538,12 +538,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/footRightY.STL" />
+          filename="../meshes/anklePitchRight.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.529411764705882 0.549019607843137 0.549019607843137 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
   </link>
@@ -554,28 +554,28 @@
       xyz="0 0 -0.37"
       rpy="0 0 0" />
     <parent
-      link="shin_Right" />
+      link="shinRight" />
     <child
-      link="footRightY" />
+      link="anklePitchRight" />
     <axis
       xyz="0 1 0" />
     <limit effort="40.0" lower="-1.0" upper="0.35" velocity="20.0"/>
   </joint>
   <link
-    name="toe_right">
+    name="toeRight">
     <inertial>
       <origin
-        xyz="0.052656 -0.117093 -0.900329"
+        xyz="0.03700297 0.00002151 -0.04197563"
         rpy="0 0 0" />
       <mass
-        value="0.436113" />
+        value="0.47580000" />
       <inertia
-        ixx="0.000297"
-        ixy="-0.000013"
-        ixz="-0.000137"
-        iyy="0.001513"
-        iyz="-0.000001"
-        izz="0.001542" />
+        ixx="0.00028522"
+        ixy="-0.00001320"
+        ixz="-0.00012034"
+        iyy="0.00152191"
+        iyz="-0.00000143"
+        izz="0.00158164" />
     </inertial>
     <visual>
       <origin
@@ -583,7 +583,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/toe_right.STL" />
+          filename="../meshes/toeRight.STL" />
       </geometry>
       <material
         name="">
@@ -605,9 +605,9 @@
       xyz="0 0 0"
       rpy="0 0 0" />
     <parent
-      link="footRightY" />
+      link="anklePitchRight" />
     <child
-      link="toe_right" />
+      link="toeRight" />
     <axis
       xyz="1 0 0" />
     <limit effort="12.0" lower="-0.3491" upper="0.3491" velocity="20.0"/>
@@ -616,17 +616,17 @@
     name="waistRoll">
     <inertial>
       <origin
-        xyz="0.001521 0.001495 0.039984"
+        xyz="0.00212014 0.00212051 0.03999987"
         rpy="0 0 0" />
       <mass
-        value="2.50" />
+        value="2.18430742" />
       <inertia
-        ixx="0.006751"
-        ixy="-0.000006"
-        ixz="-0.000148"
-        iyy="0.006755"
-        iyz="0.000153"
-        izz="0.002476" />
+        ixx="0.00490282"
+        ixy="-0.00000839"
+        ixz="-0.00014940"
+        iyy="0.00490290"
+        iyz="0.00014939"
+        izz="0.00201818" />
     </inertial>
     <visual>
       <origin
@@ -639,7 +639,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -647,7 +647,7 @@
     name="waistRoll"
     type="revolute">
     <origin
-      xyz="0 0 0.05023"
+      xyz="0 0 0.044"
       rpy="0 0 0" />
     <parent
       link="pelvis" />
@@ -661,17 +661,17 @@
     name="waistPitch">
     <inertial>
       <origin
-        xyz="0.0 -0.003646 0.029114"
+        xyz="-0.00066627 0.00070478 0.02506554"
         rpy="0 0 0" />
       <mass
-        value="0.654478" />
+        value="0.49870000" />
       <inertia
-        ixx="0.001170"
-        ixy="0.0"
-        ixz="0.0"
-        iyy="0.000774"
-        iyz="0.000039"
-        izz="0.001207" />
+        ixx="0.00136060"
+        ixy="0.00000019"
+        ixz="-0.00000061"
+        iyy="0.00061064"
+        iyz="-0.00002570"
+        izz="0.00144067" />
     </inertial>
     <visual>
       <origin
@@ -684,7 +684,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -706,17 +706,17 @@
     name="torso">
     <inertial>
       <origin
-        xyz="0.011209 -0.000020 0.195205"
+        xyz="0.00080019 -0.00003149 0.18300318"
         rpy="0 0 0" />
       <mass
-        value="10.464000" />
+        value="13.28595962" />
       <inertia
-        ixx="0.196976"
-        ixy="-0.000006"
-        ixz="0.010257"
-        iyy="0.182929"
-        iyz="0.000040"
-        izz="0.064002" />
+        ixx="0.19892857"
+        ixy="0.00002898"
+        ixz="0.00372210"
+        iyy="0.16115382"
+        iyz="-0.00010404"
+        izz="0.07256954" />
     </inertial>
     <visual>
       <origin
@@ -729,7 +729,7 @@
       <material
         name="">
         <color
-          rgba="0.43921568627451 0.43921568627451 0.43921568627451 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
@@ -745,7 +745,7 @@
     name="waistYaw"
     type="revolute">
     <origin
-      xyz="0 0 0.056115"
+      xyz="0 0.0005 0.053"
       rpy="0 0 0" />
     <parent
       link="waistPitch" />
@@ -756,64 +756,20 @@
     <limit effort="110" lower="-0.78" upper="0.78" velocity="8.0"/>
   </joint>
   <link
-    name="shoulderBaseLeft">
-    <inertial>
-      <origin
-        xyz="-0.001056 0.028803 0.000067"
-        rpy="0 0 0" />
-      <mass
-        value="0.70" />
-      <inertia
-        ixx="0.000503"
-        ixy="-0.000016"
-        ixz="0.000001"
-        iyy="0.000449"
-        iyz="-0.000030"
-        izz="0.000496" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/shoulderBaseLeft.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-  </link>
-  <joint
-    name="shoulderBase_Left"
-    type="fixed">
-    <origin
-      xyz="0.0020109 0.090449 0.23022"
-      rpy="0.34907 0 0" />
-    <parent
-      link="torso" />
-    <child
-      link="shoulderBaseLeft" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-  <link
     name="shoulderPitchLeft">
     <inertial>
       <origin
-        xyz="-0.00147856291704427 0.0312404594249897 0.000194586620615556"
+        xyz="-0.00150404 0.02688841 0.00010848"
         rpy="0 0 0" />
       <mass
-        value="0.222453128267368" />
+        value="0.20310000" />
       <inertia
-        ixx="0.000175"
-        ixy="-0.000004"
-        ixz="-0.000001"
-        iyy="0.000328"
-        iyz="0.000001"
-        izz="0.000380" />
+        ixx="0.00017020"
+        ixy="-0.00000461"
+        ixz="-0.00000064"
+        iyy="0.00028895"
+        iyz="0.00000042"
+        izz="0.00034385" />
     </inertial>
     <visual>
       <origin
@@ -826,7 +782,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -834,10 +790,10 @@
     name="shoulderPitch_Left"
     type="revolute">
     <origin
-      xyz="-0.0020109 0.0717 -0.0011968"
-      rpy="0 0 0" />
+      xyz="0 0.16011 0.25742"
+      rpy="0.34907 0 0" />
     <parent
-      link="shoulderBaseLeft" />
+      link="torso" />
     <child
       link="shoulderPitchLeft" />
     <axis
@@ -848,17 +804,17 @@
     name="shoulderRollLeft">
     <inertial>
       <origin
-        xyz="-0.030453 0.010582 -0.014137"
+        xyz="-0.02860447 0.01104245 -0.01405309"
         rpy="0 0 0" />
       <mass
-        value="0.6" />
+        value="0.72480000" />
       <inertia
-        ixx="0.000749"
-        ixy="-0.000006"
-        ixz="0.000013"
-        iyy="0.000596"
-        iyz="-0.000202"
-        izz="0.000494" />
+        ixx="0.00090812"
+        ixy="-0.00002621"
+        ixz="0.00003997"
+        iyy="0.00071197"
+        iyz="-0.00025129"
+        izz="0.00060954" />
     </inertial>
     <visual>
       <origin
@@ -871,7 +827,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -887,7 +843,7 @@
     name="shoulderRoll_Left"
     type="revolute">
     <origin
-      xyz="0.0335 0.044 0"
+      xyz="0.0335 0.0435 0"
       rpy="-0.34907 0 0" />
     <parent
       link="shoulderPitchLeft" />
@@ -901,17 +857,17 @@
     name="shoulderYawLeft">
     <inertial>
       <origin
-        xyz="-0.000951633773749558 -0.000636479898313447 -0.0979643093792619"
+        xyz="-0.00069813 0.00102049 -0.06842313"
         rpy="0 0 0" />
       <mass
-        value="0.853573592139701" />
+        value="0.69630000" />
       <inertia
-        ixx="0.004701"
-        ixy="-0.000001"
-        ixz="0.000074"
-        iyy="0.004533"
-        iyz="0.000061"
-        izz="0.000562" />
+        ixx="0.00317887"
+        ixy="0.00000059"
+        ixz="0.00005528"
+        iyy="0.00310433"
+        iyz="-0.00009472"
+        izz="0.00039452" />
     </inertial>
     <visual>
       <origin
@@ -924,7 +880,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -940,7 +896,7 @@
     name="shoulderYaw_Left"
     type="revolute">
     <origin
-      xyz="-0.0335 0.034081 -0.059"
+      xyz="-0.0335 0.034 -0.0585"
       rpy="0 0 0" />
     <parent
       link="shoulderRollLeft" />
@@ -954,17 +910,17 @@
     name="elbowLeft">
     <inertial>
       <origin
-        xyz="-0.00410192417538807 0.0270255372034407 -0.0125478950788627"
+        xyz="-0.02164423 0.02776208 -0.04469642"
         rpy="0 0 0" />
       <mass
-        value="0.6" />
+        value="0.85400000" />
       <inertia
-        ixx="0.000490"
-        ixy="-0.000003"
-        ixz="0.000074"
-        iyy="0.000517"
-        iyz="-0.000009"
-        izz="0.000266" />
+        ixx="0.00072987"
+        ixy="-0.00001380"
+        ixz="0.00015644"
+        iyy="0.00080410"
+        iyz="-0.00002763"
+        izz="0.00047565" />
     </inertial>
     <visual>
       <origin
@@ -977,23 +933,15 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin
-        xyz="0.0 0.03 0.0"
-        rpy="1.5708 0 0" />
-      <geometry>
-        <cylinder length="0.08" radius="0.035"/>
-      </geometry>
-    </collision>
   </link>
   <joint
     name="elbow_Left"
     type="revolute">
     <origin
-      xyz="0 -0.0285 -0.20365"
+      xyz="0 -0.0285 -0.20415"
       rpy="0 0 0" />
     <parent
       link="shoulderYawLeft" />
@@ -1007,17 +955,17 @@
     name="wristYawLeft">
     <inertial>
       <origin
-        xyz="-0.000012 0.000792 -0.146497"
+        xyz="0.00001826 -0.00013856 -0.15608944"
         rpy="0 0 0" />
       <mass
-        value="0.276361" />
+        value="0.73460000" />
       <inertia
-        ixx="0.002248"
-        ixy="-0.000000"
-        ixz="0.000000"
-        iyy="0.002253"
-        iyz="-0.000019"
-        izz="0.000105" />
+        ixx="0.00772306"
+        ixy="0.00000000"
+        ixz="0.00000198"
+        iyy="0.00772311"
+        iyz="0.00001414"
+        izz="0.00029992" />
     </inertial>
     <visual>
       <origin
@@ -1025,28 +973,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/forearmLeft.STL" />
+          filename="../meshes/wristYawLeft.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin
-        xyz="0 0 -0.12"
-        rpy="0 0 0" />
-      <geometry>
-        <cylinder length="0.28" radius="0.035"/>
-      </geometry>
-    </collision>
   </link>
   <joint
     name="wristYaw_Left"
     type="fixed">
     <origin
-      xyz="-0.0150000000000083 0.0285000000000339 -0.0734000000000177"
+      xyz="-0.025 0.0285 -0.0729"
       rpy="0 0 0" />
     <parent
       link="elbowLeft" />
@@ -1054,95 +994,23 @@
       link="wristYawLeft" />
     <axis
       xyz="0 0 1" />
-  </joint>
-  <link
-    name="wristLeft">
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <sphere radius="0.035"/>
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-  </link>
-  <joint
-    name="wrist_Left"
-    type="fixed">
-    <origin
-      xyz="-0.0150000000000083 0.0285000000000339 -0.3034000000000177"
-      rpy="0 0 0" />
-    <parent
-      link="elbowLeft" />
-    <child
-      link="wristLeft" />
-    <axis
-      xyz="0 0 1" />
-  </joint>
-  <link
-    name="shoulderBaseRight">
-    <inertial>
-      <origin
-        xyz="-0.001056 -0.028803 0.000067"
-        rpy="0 0 0" />
-      <mass
-        value="0.70" />
-      <inertia
-        ixx="0.000503"
-        ixy="0.000016"
-        ixz="0.000001"
-        iyy="0.000449"
-        iyz="0.000030"
-        izz="0.000496" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/shoulderBaseRight.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-  </link>
-  <joint
-    name="shoulderBase_Right"
-    type="fixed">
-    <origin
-      xyz="0.0020109 -0.090449 0.23022"
-      rpy="-0.34907 0 0" />
-    <parent
-      link="torso" />
-    <child
-      link="shoulderBaseRight" />
-    <axis
-      xyz="0 0 0" />
+    <limit effort="6.4" velocity="4.9218"/>
   </joint>
   <link
     name="shoulderPitchRight">
     <inertial>
       <origin
-        xyz="-0.00147856291704427 -0.0312404594249897 0.000194586620615556"
+        xyz="-0.00150404 -0.02687227 0.00010766"
         rpy="0 0 0" />
       <mass
-        value="0.222453128267368" />
+        value="0.20310000" />
       <inertia
-        ixx="0.000175"
-        ixy="0.000004"
-        ixz="-0.000001"
-        iyy="0.000328"
-        iyz="-0.000001"
-        izz="0.000380" />
+        ixx="0.00017009"
+        ixy="0.00000447"
+        ixz="-0.00000064"
+        iyy="0.00028895"
+        iyz="-0.00000043"
+        izz="0.00034374" />
     </inertial>
     <visual>
       <origin
@@ -1155,7 +1023,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
   </link>
@@ -1163,10 +1031,10 @@
     name="shoulderPitch_Right"
     type="revolute">
     <origin
-      xyz="-0.0020109 -0.0717 -0.0011968"
-      rpy="0 0 0" />
+      xyz="0 -0.16011 0.25742"
+      rpy="-0.34907 0 0" />
     <parent
-      link="shoulderBaseRight" />
+      link="torso" />
     <child
       link="shoulderPitchRight" />
     <axis
@@ -1177,17 +1045,17 @@
     name="shoulderRollRight">
     <inertial>
       <origin
-        xyz="-0.030453 -0.010582 -0.014137"
+        xyz="-0.02860454 -0.01104592 -0.01404986"
         rpy="0 0 0" />
       <mass
-        value="0.6" />
+        value="0.72480000" />
       <inertia
-        ixx="0.000749"
-        ixy="0.000006"
-        ixz="0.000013"
-        iyy="0.000596"
-        iyz="0.000202"
-        izz="0.000494" />
+        ixx="0.00090814"
+        ixy="0.00002628"
+        ixz="0.00003990"
+        iyy="0.00071184"
+        iyz="0.00025129"
+        izz="0.00060969" />
     </inertial>
     <visual>
       <origin
@@ -1200,7 +1068,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -1216,7 +1084,7 @@
     name="shoulderRoll_Right"
     type="revolute">
     <origin
-      xyz="0.0335 -0.044 0"
+      xyz="0.0335 -0.0435 0"
       rpy="0.34907 0 0" />
     <parent
       link="shoulderPitchRight" />
@@ -1230,17 +1098,17 @@
     name="shoulderYawRight">
     <inertial>
       <origin
-        xyz="-0.000951633773749558 0.000636479898313447 -0.0979643093792619"
+        xyz="-0.00089274 -0.00096643 -0.06980518"
         rpy="0 0 0" />
       <mass
-        value="0.853573592139701" />
+        value="0.69630000" />
       <inertia
-        ixx="0.004701"
-        ixy="0.000001"
-        ixz="0.000074"
-        iyy="0.004533"
-        iyz="-0.000061"
-        izz="0.000562" />
+        ixx="0.00304636"
+        ixy="-0.00000070"
+        ixz="0.00005211"
+        iyy="0.00297764"
+        iyz="0.00008904"
+        izz="0.00041751" />
     </inertial>
     <visual>
       <origin
@@ -1253,7 +1121,7 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -1269,7 +1137,7 @@
     name="shoulderYaw_Right"
     type="revolute">
     <origin
-      xyz="-0.0335 -0.034081 -0.059"
+      xyz="-0.0335 -0.034 -0.0585"
       rpy="0 0 0" />
     <parent
       link="shoulderRollRight" />
@@ -1283,17 +1151,17 @@
     name="elbowRight">
     <inertial>
       <origin
-        xyz="-0.00410192417538807 -0.0270255372034407 -0.0125478950788627"
+        xyz="-0.01212328 -0.02629569 -0.02658404"
         rpy="0 0 0" />
       <mass
-        value="0.6" />
+        value="0.85400000" />
       <inertia
-        ixx="0.000490"
-        ixy="0.000003"
-        ixz="0.000074"
-        iyy="0.000517"
-        iyz="0.000009"
-        izz="0.000266" />
+        ixx="0.00099546"
+        ixy="0.00002241"
+        ixz="0.00027937"
+        iyy="0.00111379"
+        iyz="0.00004820"
+        izz="0.00053993" />
     </inertial>
     <visual>
       <origin
@@ -1306,23 +1174,15 @@
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin
-        xyz="0.0 -0.03 0.0"
-        rpy="1.5708 0 0" />
-      <geometry>
-        <cylinder length="0.08" radius="0.035"/>
-      </geometry>
-    </collision>
   </link>
   <joint
     name="elbow_Right"
     type="revolute">
     <origin
-      xyz="0 0.0285 -0.20365"
+      xyz="0 0.0285 -0.20415"
       rpy="0 0 0" />
     <parent
       link="shoulderYawRight" />
@@ -1336,17 +1196,17 @@
     name="wristYawRight">
     <inertial>
       <origin
-        xyz="-0.000012 -0.000792 -0.146497"
+        xyz="0.00001640 0.00018166 -0.17795217"
         rpy="0 0 0" />
       <mass
-        value="0.276361" />
+        value="0.73460000" />
       <inertia
-        ixx="0.002248"
-        ixy="0.000000"
-        ixz="0.000000"
-        iyy="0.002253"
-        iyz="0.000019"
-        izz="0.000105" />
+        ixx="0.00787989"
+        ixy="0.00000000"
+        ixz="0.00000202"
+        iyy="0.00788003"
+        iyz="-0.00001563"
+        izz="0.00031258" />
     </inertial>
     <visual>
       <origin
@@ -1354,28 +1214,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/forearmRight.STL" />
+          filename="../meshes/wristYawRight.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
-    <collision>
-      <origin
-        xyz="0 0 -0.12"
-        rpy="0 0 0" />
-      <geometry>
-        <cylinder length="0.28" radius="0.035"/>
-      </geometry>
-    </collision>
   </link>
   <joint
     name="wristYaw_Right"
     type="fixed">
     <origin
-      xyz="-0.0149999999999991 -0.0285000000000092 -0.0733999999999902"
+      xyz="-0.025 -0.0285 -0.0729"
       rpy="0 0 0" />
     <parent
       link="elbowRight" />
@@ -1383,35 +1235,5 @@
       link="wristYawRight" />
     <axis
       xyz="0 0 1" />
-  </joint>
-  <link
-    name="wristRight">
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <sphere radius="0.035"/>
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-  </link>
-  <joint
-    name="wrist_Right"
-    type="fixed">
-    <origin
-      xyz="-0.0149999999999991 -0.0285000000000092 -0.3033999999999902"
-      rpy="0 0 0" />
-    <parent
-      link="elbowRight" />
-    <child
-      link="wristRight" />
-    <axis
-      xyz="0 0 1" />
-    <limit effort="30.0" lower="-3.14" upper="3.14" velocity="8.0"/>
   </joint>
 </robot>
