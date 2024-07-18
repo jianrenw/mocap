@@ -77,11 +77,13 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
 data_path = "data/out/isaac_adam_standard.pt"
-key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
+# key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
+key = 'CMU_88_88_11_poses'
 adam_poses = joblib.load(data_path)
-keys = list(adam_poses.keys())
+# keys = list(adam_poses.keys())
 # key = keys[301]
 adam_pose = adam_poses[key]
+# joblib.dump(adam_pose, "data/out/walk_standard.pt")
 
 
 root_pos = adam_pose["root_pos"]
