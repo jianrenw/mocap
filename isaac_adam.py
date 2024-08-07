@@ -100,7 +100,8 @@ def adam_to_isaac(adam_pose):
             rigid_body_states.append(rigid_body_state.clone())
 
 
-    dt = 1 / adam_pose['real_frame_rate'] # 
+    # dt = 1 / adam_pose['real_frame_rate'] # 
+    dt = 1 / 60
     rigid_body_states = torch.stack(rigid_body_states, dim=0)
     current_body_pos = rigid_body_states[:-1, :, 0:3]
     next_body_pos = rigid_body_states[1:, :, 0:3]
@@ -123,20 +124,37 @@ def adam_to_isaac(adam_pose):
     len_traj = diff_global_body_rot.shape[0]
     euler_from_quat = torch_utils.euler_from_quat(diff_global_body_rot.reshape(-1, 4)).reshape(len_traj, -1, 3) / dt
 
+    # result = {
+    #     'body_pos': current_body_pos.numpy(), 
+    #     'root_pos': root_pos[1:-1], 
+    #     # 'dof_pos': joint_poses[1:-1], 
+    #     'dof_pos': dof_states[1:-1,:,0], 
+    #     'body_rot': current_body_rot.numpy(), 
+    #     'root_rot': root_rot[1:-1], 
+    #     'body_vel': body_vel.numpy(), 
+    #     'root_vel': body_vel[:,0,:].numpy(), 
+    #     # 'body_angular_vel': body_angular_vel.numpy(), 
+    #     # 'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
+    #     'body_angular_vel': euler_from_quat.numpy(), 
+    #     'root_angular_vel': euler_from_quat[:,0,:].numpy(), 
+    #     'dof_vel': dof_vel[1:], 
+    #     'dt': dt, 
+    # }
+
     result = {
-        'body_pos': current_body_pos.numpy(), 
-        'root_pos': root_pos[1:-1], 
+        'body_pos': current_body_pos.numpy()[8:], 
+        'root_pos': root_pos[1:-1][8:], 
         # 'dof_pos': joint_poses[1:-1], 
-        'dof_pos': dof_states[1:-1,:,0], 
-        'body_rot': current_body_rot.numpy(), 
-        'root_rot': root_rot[1:-1], 
-        'body_vel': body_vel.numpy(), 
-        'root_vel': body_vel[:,0,:].numpy(), 
+        'dof_pos': dof_states[1:-1,:,0][8:], 
+        'body_rot': current_body_rot.numpy()[8:], 
+        'root_rot': root_rot[1:-1][8:], 
+        'body_vel': body_vel.numpy()[8:], 
+        'root_vel': body_vel[:,0,:].numpy()[8:], 
         # 'body_angular_vel': body_angular_vel.numpy(), 
         # 'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
-        'body_angular_vel': euler_from_quat.numpy(), 
-        'root_angular_vel': euler_from_quat[:,0,:].numpy(), 
-        'dof_vel': dof_vel[1:], 
+        'body_angular_vel': euler_from_quat.numpy()[8:], 
+        'root_angular_vel': euler_from_quat[:,0,:].numpy()[8:], 
+        'dof_vel': dof_vel[1:][8:], 
         'dt': dt, 
     }
 
@@ -145,26 +163,26 @@ def adam_to_isaac(adam_pose):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/out"
+        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data/videos"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/out"
+        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data/videos"
     )
 
     args = parser.parse_args()
 
-    # load motion data
-    adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
+    # # load motion data
+    # adam_poses = joblib.load(args.data_path + "/adam_lite_data.pt")
 
-    isaac_data = {}
+    # isaac_data = {}
 
-    for key in tqdm(adam_poses.keys()):
-        adam_pose = adam_poses[key]
-        result = adam_to_isaac(adam_pose)
-        if result is not None:
-            isaac_data[key] = result
+    # for key in tqdm(adam_poses.keys()):
+    #     adam_pose = adam_poses[key]
+    #     result = adam_to_isaac(adam_pose)
+    #     if result is not None:
+    #         isaac_data[key] = result
 
-    joblib.dump(isaac_data, args.out_dir + "/isaac_adam_standard.pt")
+    # joblib.dump(isaac_data, args.out_dir + "/isaac_adam_standard.pt")
 
     # # save one
     # key = list(adam_poses.keys())[10]
@@ -180,4 +198,9 @@ if __name__ == "__main__":
     #     joblib.dump(result, args.out_dir + "/{}.pt".format(motion[:-3]))
 
 
-
+    motions = os.path.join(args.data_path, "processed")
+    motions = os.listdir(motions)
+    for motion in motions:
+        adam_pose = joblib.load(os.path.join(args.data_path, "processed", motion, 'adam_output.pkl'))
+        result = adam_to_isaac(adam_pose)
+        joblib.dump(result, os.path.join(args.out_dir, '{}.pkl'.format(motion)))

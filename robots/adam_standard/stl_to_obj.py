@@ -2,7 +2,7 @@ import open3d as o3d
 import os
 import copy
 
-mesh_dir = '/home/jianrenw/mocap/adam_lite/meshes'
+mesh_dir = '/home/jianrenw/mocap/robots/adam_standard/meshes'
 mesh_files = os.listdir(mesh_dir)
 target_num_triangles = 20000
 for mesh_file in mesh_files:
