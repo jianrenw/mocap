@@ -81,7 +81,18 @@ def adam_to_isaac(adam_pose):
     if frame_num <= 2:
         return None
     
-    # import ipdb; ipdb.set_trace()
+    # # fix trajectory case by case
+    # euler = torch_utils.euler_from_quat(torch.from_numpy(root_rot))
+    # euler = euler.numpy()
+    # euler[372:,1] = 0.1
+    # euler = torch.from_numpy(euler)
+    # roll = torch.zeros(euler.shape[0])
+    # pitch = torch.zeros(euler.shape[0])
+    # yaw = torch.zeros_like(roll) + np.pi / 2
+    # root_rot_new = torch_utils.quat_from_euler_xyz(roll, pitch, yaw)
+
+    # root_rot = root_rot_new.numpy()
+    # root_pos[:,0] = 0.
 
     root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
     dof_states = torch.zeros(frame_num, len(dof_names), 2).type(torch.float32)
@@ -203,4 +214,4 @@ if __name__ == "__main__":
     for motion in motions:
         adam_pose = joblib.load(os.path.join(args.data_path, "processed", motion, 'adam_output.pkl'))
         result = adam_to_isaac(adam_pose)
-        joblib.dump(result, os.path.join(args.out_dir, '{}.pkl'.format(motion)))
+        joblib.dump(result, os.path.join(args.out_dir, '{}_fixed.pkl'.format(motion)))

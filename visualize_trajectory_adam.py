@@ -77,14 +77,16 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
 # data_path = "data/out/isaac_adam_standard.pt"
-# # key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
+# key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
+# key = 'KIT_3_walking_medium02_poses'
 # key = 'CMU_88_88_05_poses'
 # adam_poses = joblib.load(data_path)
 # # keys = list(adam_poses.keys())
 # # key = keys[301]
 # adam_pose = adam_poses[key]
-# # joblib.dump(adam_pose, "data/out/walk_standard.pt")
-adam_pose = joblib.load("data/videos/run.pkl")
+# joblib.dump(adam_pose, "data/out/walk_fixed.pt")
+adam_pose = joblib.load("data/out/walk_fixed.pt")
+
 
 
 root_pos = adam_pose["root_pos"]
@@ -123,6 +125,6 @@ for i in range(frame_num):
     # # update the viewer
     gym.step_graphics(sim)
     gym.draw_viewer(viewer, sim, True)
-    time.sleep(0.05)
+    time.sleep(0.01)
     # time.sleep(5000)
     # gym.clear_lines(viewer)
