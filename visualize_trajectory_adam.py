@@ -40,7 +40,7 @@ gym.add_ground(sim, plane_params)
 # asset_root = "robots/adam_lite"
 # asset_file = "urdf/adam_lite.urdf"
 asset_root = "robots/adam_standard"
-asset_file = "urdf/adam_standard.urdf"
+asset_file = "urdf/adam_standard_foot_contact.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
 rigid_body_names = gym.get_asset_rigid_body_names(robot_asset)
 rigid_body_dict = gym.get_asset_rigid_body_dict(robot_asset)
@@ -85,11 +85,13 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 # # key = keys[301]
 # adam_pose = adam_poses[key]
 # joblib.dump(adam_pose, "data/out/walk_fixed.pt")
-adam_pose = joblib.load("data/out/walk_fixed.pt")
+# adam_pose = joblib.load("data/out/walk_fixed.pt")
+adam_pose = joblib.load("test.pt")
 
 
 
-root_pos = adam_pose["root_pos"]
+# root_pos = adam_pose["root_pos"]
+root_pos = adam_pose["new_root_poses"]
 root_rot = adam_pose["root_rot"]
 root_vel = adam_pose["root_vel"]
 root_angular_vel = adam_pose["root_angular_vel"]
@@ -108,7 +110,8 @@ print(body_pos.shape)
 
 
 def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
-    track_link = [rigid_body_names.index('anklePitchLeft'), rigid_body_names.index('anklePitchRight'), rigid_body_names.index('wristPitchLeft'), rigid_body_names.index('wristPitchRight')]
+    # track_link = [rigid_body_names.index('anklePitchLeft'), rigid_body_names.index('anklePitchRight'), rigid_body_names.index('wristPitchLeft'), rigid_body_names.index('wristPitchRight')]
+    track_link = [7, 8, 9, 10, 17, 18, 19, 20]
     updated_body_pos = body_pos[track_link]
     for ubp in updated_body_pos:
         sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)
@@ -120,11 +123,14 @@ def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
 for i in range(frame_num):
     gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
     gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
-    draw_reference(gym, viewer, env, body_pos[i])
+    gym.refresh_rigid_body_state_tensor(sim)
+    rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
+    rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
+    draw_reference(gym, viewer, env, rigid_body_state)
 
     # # update the viewer
     gym.step_graphics(sim)
     gym.draw_viewer(viewer, sim, True)
-    time.sleep(0.01)
+    time.sleep(0.1)
     # time.sleep(5000)
     # gym.clear_lines(viewer)
