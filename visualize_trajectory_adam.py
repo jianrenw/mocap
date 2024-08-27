@@ -32,13 +32,7 @@ plane_params.restitution = 0
 # create the ground plane
 gym.add_ground(sim, plane_params)
 
-# add cartpole urdf asset
-# asset_root = "adam"
-# asset_file = "urdf/adam.urdf"
-# asset_root = "adam_lite_v2"
-# asset_file = "urdf/adam_lite_v2_wrist_yaw.urdf"
-# asset_root = "robots/adam_lite"
-# asset_file = "urdf/adam_lite.urdf"
+# urdf asset
 asset_root = "robots/adam_standard"
 asset_file = "urdf/adam_standard_foot_contact.urdf"
 robot_asset = gym.load_asset(sim, asset_root, asset_file)
@@ -76,37 +70,25 @@ cam_target = gymapi.Vec3(0, 2, 1.5)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-# data_path = "data/out/isaac_adam_standard.pt"
-# key = 'ACCAD_Male2MartialArtsStances_c3d_D5 - ready to walk away_poses'
-# key = 'KIT_3_walking_medium02_poses'
-# key = 'CMU_88_88_05_poses'
-# adam_poses = joblib.load(data_path)
-# # keys = list(adam_poses.keys())
-# # key = keys[301]
-# adam_pose = adam_poses[key]
-# joblib.dump(adam_pose, "data/out/walk_fixed.pt")
-# adam_pose = joblib.load("data/out/walk_fixed.pt")
-adam_pose = joblib.load("test.pt")
+adam_poses = joblib.load("/home/jianrenw/MAP/data/isaac_adam_standard_walk.pt")
+key = 'BioMotionLab_NTroje_rub032_0027_circle_walk_poses'
+adam_pose = adam_poses[key]
 
-
-
-# root_pos = adam_pose["root_pos"]
-root_pos = adam_pose["new_root_poses"]
+root_pos = adam_pose["root_pos"]
 root_rot = adam_pose["root_rot"]
 root_vel = adam_pose["root_vel"]
 root_angular_vel = adam_pose["root_angular_vel"]
 dof_pos = adam_pose["dof_pos"]
 dof_vel = adam_pose["dof_vel"]
 body_pos = adam_pose["body_pos"]
+left_foot_contact = adam_pose["left_foot_contact"]
+right_foot_contact = adam_pose["right_foot_contact"]
+dt = adam_pose["dt"] 
+
 frame_num = len(root_pos)
 
-# root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
-# joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, dof_pos.shape[1])],axis=2).type(torch.float32)
 root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.from_numpy(root_vel), torch.from_numpy(root_angular_vel)], dim=1).type(torch.float32)
 joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.from_numpy(dof_vel)],axis=2).type(torch.float32)
-print(root_vel[0])
-
-print(body_pos.shape)
 
 
 def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
@@ -118,19 +100,33 @@ def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
         sphere_geom = gymutil.WireframeSphereGeometry(radius, 10, 10, None, color=(1, 0, 0))
         gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
 
+def draw_contact(gym, viewer, env_handle, body_pos, left_foot_contact, right_foot_contact):
+    if left_foot_contact:
+        left_foot_pos = body_pos[rigid_body_names.index('toeLeft')]
+        sphere_pose = gymapi.Transform(gymapi.Vec3(left_foot_pos[0], left_foot_pos[1], left_foot_pos[2]), r=None)
+        sphere_geom = gymutil.WireframeSphereGeometry(0.05, 10, 10, None, color=(1, 0, 0))
+        gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
+    if right_foot_contact:
+        right_foot_pos = body_pos[rigid_body_names.index('toeRight')]
+        sphere_pose = gymapi.Transform(gymapi.Vec3(right_foot_pos[0], right_foot_pos[1], right_foot_pos[2]), r=None)
+        sphere_geom = gymutil.WireframeSphereGeometry(0.05, 10, 10, None, color=(1, 0, 0))
+        gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
 
 # Simulate
-for i in range(frame_num):
-    gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
-    gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
-    gym.refresh_rigid_body_state_tensor(sim)
-    rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
-    rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
-    draw_reference(gym, viewer, env, rigid_body_state)
-
-    # # update the viewer
-    gym.step_graphics(sim)
-    gym.draw_viewer(viewer, sim, True)
-    time.sleep(0.1)
-    # time.sleep(5000)
-    # gym.clear_lines(viewer)
+while True:
+    for i in range(frame_num):
+        begin_time = time.time()
+        gym.set_actor_root_state_tensor(sim, gymtorch.unwrap_tensor(root_states[i]))
+        gym.set_dof_state_tensor(sim, gymtorch.unwrap_tensor(joint_poses[i]))
+        gym.refresh_rigid_body_state_tensor(sim)
+        rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
+        rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
+        draw_contact(gym, viewer, env, rigid_body_state[:,0:3], left_foot_contact[i], right_foot_contact[i])
+    
+        # update the viewer
+        gym.step_graphics(sim)
+        gym.draw_viewer(viewer, sim, True)
+        end_time = time.time()
+        if end_time - begin_time < dt:
+            time.sleep(dt - (end_time - begin_time))
+        gym.clear_lines(viewer)
