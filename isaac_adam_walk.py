@@ -202,6 +202,7 @@ def adam_to_isaac(adam_pose, name):
         'body_angular_vel': euler_from_quat.numpy(), 
         'root_angular_vel': euler_from_quat[:,0,:].numpy(), 
         'dof_vel': dof_vel[1:],
+        'dof_vel_sign': np.sign(dof_vel[1:]),
         'left_foot_contact': left_foot_contact[1:],
         'right_foot_contact': right_foot_contact[1:],
         'dt': dt, 
@@ -212,10 +213,10 @@ def adam_to_isaac(adam_pose, name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data"
+        "--data_path", type=str, help="dataset directory", default="/data/home/jianrenw/mocap/data"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/home/jianrenw/mocap/data"
+        "--out_dir", type=str, help="output directory", default="/data/home/jianrenw/MAP/data"
     )
 
     args = parser.parse_args()
