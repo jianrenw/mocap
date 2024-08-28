@@ -203,8 +203,8 @@ def adam_to_isaac(adam_pose, name):
         'root_angular_vel': euler_from_quat[:,0,:].numpy(), 
         'dof_vel': dof_vel[1:],
         'dof_vel_sign': np.sign(dof_vel[1:]),
-        'left_foot_contact': left_foot_contact[1:],
-        'right_foot_contact': right_foot_contact[1:],
+        'left_foot_contact': left_foot_contact[1:-1],
+        'right_foot_contact': right_foot_contact[1:-1],
         'dt': dt, 
     }
 
