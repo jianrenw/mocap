@@ -70,7 +70,7 @@ cam_target = gymapi.Vec3(0, 2, 1.5)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
 # load motion data
-adam_poses = joblib.load("/home/jianrenw/MAP/data/isaac_adam_standard_walk.pt")
+adam_poses = joblib.load("/home/jianrenw/mocap/data/isaac_adam_standard_walk.pt")
 key = 'BioMotionLab_NTroje_rub032_0027_circle_walk_poses'
 adam_pose = adam_poses[key]
 
