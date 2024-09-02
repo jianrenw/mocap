@@ -160,9 +160,6 @@ def adam_to_isaac(adam_pose, w):
 
     return adam_pose
 
-def label_smoother():
-    
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
