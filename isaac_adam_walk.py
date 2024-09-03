@@ -188,8 +188,8 @@ def adam_to_isaac(adam_pose, name):
 
 
     diff_global_body_rot = torch_utils.quat_mul(next_body_rot, torch_utils.quat_conjugate(current_body_rot))
-    len_traj = diff_global_body_rot.shape[0]
-    euler_from_quat = torch_utils.euler_from_quat(diff_global_body_rot.reshape(-1, 4)).reshape(len_traj, -1, 3) / dt
+    diff_global_body_angle, diff_global_body_axis = torch_utils.quat_to_angle_axis(diff_global_body_rot)   
+    body_angular_vel = diff_global_body_angle[:,:,None] * diff_global_body_axis / dt
 
     result = {
         'body_pos': current_body_pos.numpy(), 
@@ -199,8 +199,8 @@ def adam_to_isaac(adam_pose, name):
         'root_rot': root_rot[1:-1], 
         'body_vel': body_vel.numpy(), 
         'root_vel': body_vel[:,0,:].numpy(), 
-        'body_angular_vel': euler_from_quat.numpy(), 
-        'root_angular_vel': euler_from_quat[:,0,:].numpy(), 
+        'body_angular_vel': body_angular_vel.numpy(), 
+        'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
         'dof_vel': dof_vel[1:],
         'dof_vel_sign': np.sign(dof_vel[1:]),
         'left_foot_contact': left_foot_contact[1:-1],
@@ -213,10 +213,10 @@ def adam_to_isaac(adam_pose, name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_path", type=str, help="dataset directory", default="/data/home/jianrenw/mocap/data"
+        "--data_path", type=str, help="dataset directory", default="/home/jianrenw/mocap/data"
     )
     parser.add_argument(
-        "--out_dir", type=str, help="output directory", default="/data/home/jianrenw/MAP/data"
+        "--out_dir", type=str, help="output directory", default="/home/jianrenw/MAP/data"
     )
 
     args = parser.parse_args()
