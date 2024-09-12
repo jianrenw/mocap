@@ -66,6 +66,20 @@ pose.p = gymapi.Vec3(0.0, 0.0, 2.0)
 
 actor_handle = gym.create_actor(env, robot_asset, pose, "adam_actor", 0, 1)
 
+def label_contact(left_ankle_poses, right_ankle_poses, threshold = 0.17):
+    
+    left_z = left_ankle_poses[:,2]
+    right_z = right_ankle_poses[:,2]
+
+    left_foot_contact = np.zeros_like(left_z)
+    right_foot_contact = np.zeros_like(right_z)
+
+    left_foot_contact[left_z < threshold] = 1
+    right_foot_contact[right_z < threshold] = 1
+
+    return left_foot_contact, right_foot_contact
+
+
 def adam_to_isaac(adam_pose, name):
 
     root_pos = adam_pose["root_pos"]
@@ -86,7 +100,6 @@ def adam_to_isaac(adam_pose, name):
     rigid_body_states = []
 
     # Simulate
-    new_root_poses = []
     left_ankle_poses = []
     right_ankle_poses = []
 
@@ -99,19 +112,19 @@ def adam_to_isaac(adam_pose, name):
         rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
         left_foot_poses = rigid_body_state[left_foot_indices, 0:3]
         right_foot_poses = rigid_body_state[right_foot_indices, 0:3]
-        left_ankle_pose = rigid_body_state[left_ankle_idx, 0:3]
-        right_ankle_pose = rigid_body_state[right_ankle_idx, 0:3]
-        new_root_pose = root_states[i, 0:3]
-        new_root_pose[2] = root_states[i, 2] - torch.min(torch.cat([left_foot_poses, right_foot_poses])[:,2])
-        new_root_poses.append(new_root_pose.clone())
+
+        new_rigid_body_state = rigid_body_state.clone()
+        new_rigid_body_state[:,2] = new_rigid_body_state[:,2] - torch.min(torch.cat([left_foot_poses, right_foot_poses])[:,2])
+
+        left_ankle_pose = new_rigid_body_state[left_ankle_idx, 0:3]
+        right_ankle_pose = new_rigid_body_state[right_ankle_idx, 0:3]
         left_ankle_poses.append(left_ankle_pose.clone())
         right_ankle_poses.append(right_ankle_pose.clone())
 
-        new_rigid_body_state = rigid_body_state[useful_body_indices].clone()
-        new_rigid_body_state[:,2] = new_rigid_body_state[:,2] - torch.min(torch.cat([left_foot_poses, right_foot_poses])[:,2])
-
         if i >= 1: # skip the first frame
-            rigid_body_states.append(new_rigid_body_state)
+            rigid_body_states.append(new_rigid_body_state[useful_body_indices])
+        
+        left_foot_contact, right_foot_contact = label_contact(torch.stack(left_ankle_poses).numpy(), torch.stack(right_ankle_poses).numpy())
 
     dt = 1 / adam_pose['real_frame_rate']
     rigid_body_states = torch.stack(rigid_body_states, dim=0)
@@ -144,6 +157,8 @@ def adam_to_isaac(adam_pose, name):
         'root_angular_vel': body_angular_vel[:,0,:].numpy(), 
         'dof_vel': dof_vel[1:],
         'dof_vel_sign': np.sign(dof_vel[1:]),
+        'left_foot_contact': left_foot_contact[1:-1],
+        'right_foot_contact': right_foot_contact[1:-1],
         'dt': dt, 
     }
 

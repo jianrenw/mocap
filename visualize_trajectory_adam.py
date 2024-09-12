@@ -77,7 +77,9 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 # adam_pose = adam_poses[key]
 
 adam_poses = joblib.load("/home/jianrenw/mocap/data/actioncore/action_core.pt")
-key = 'greeting-small-wave'
+# key = 'thanks-bow'
+# key = 'directing-over-there'
+key = "billiejean_dance01"
 adam_pose = adam_poses[key]
 
 root_pos = adam_pose["root_pos"]
@@ -87,8 +89,8 @@ root_angular_vel = adam_pose["root_angular_vel"]
 dof_pos = adam_pose["dof_pos"]
 dof_vel = adam_pose["dof_vel"]
 body_pos = adam_pose["body_pos"]
-# left_foot_contact = adam_pose["left_foot_contact"]
-# right_foot_contact = adam_pose["right_foot_contact"]
+left_foot_contact = adam_pose["left_foot_contact"]
+right_foot_contact = adam_pose["right_foot_contact"]
 dt = adam_pose["dt"] 
 
 frame_num = len(root_pos)
@@ -96,6 +98,9 @@ frame_num = len(root_pos)
 root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.from_numpy(root_vel), torch.from_numpy(root_angular_vel)], dim=1).type(torch.float32)
 joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.from_numpy(dof_vel)],axis=2).type(torch.float32)
 
+
+print(left_foot_contact)
+print(right_foot_contact)
 
 def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
     # track_link = [rigid_body_names.index('anklePitchLeft'), rigid_body_names.index('anklePitchRight'), rigid_body_names.index('wristPitchLeft'), rigid_body_names.index('wristPitchRight')]
@@ -127,7 +132,7 @@ while True:
         gym.refresh_rigid_body_state_tensor(sim)
         rigid_body_state = gym.acquire_rigid_body_state_tensor(sim)
         rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
-        # draw_contact(gym, viewer, env, rigid_body_state[:,0:3], left_foot_contact[i], right_foot_contact[i])
+        draw_contact(gym, viewer, env, rigid_body_state[:,0:3], left_foot_contact[i], right_foot_contact[i])
     
         # update the viewer
         gym.step_graphics(sim)
@@ -135,4 +140,4 @@ while True:
         end_time = time.time()
         if end_time - begin_time < dt:
             time.sleep(dt - (end_time - begin_time))
-        # gym.clear_lines(viewer)
+        gym.clear_lines(viewer)
