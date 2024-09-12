@@ -77,9 +77,13 @@ gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 # adam_pose = adam_poses[key]
 
 adam_poses = joblib.load("/home/jianrenw/mocap/data/actioncore/action_core.pt")
-# key = 'thanks-bow'
-# key = 'directing-over-there'
-key = "billiejean_dance01"
+key =  (
+    # "thanks-bow"
+    # "billiejean_dance01"
+    "directing-over-there"
+    # "greeting-small-wave"
+    # "thanks-gentleman-bow"
+)
 adam_pose = adam_poses[key]
 
 root_pos = adam_pose["root_pos"]

@@ -487,6 +487,7 @@ if __name__ == "__main__":
    
     data_files = os.listdir(args.data_path)
     for data_file in data_files:
+        print(data_file)
         motion = json.load(open(os.path.join(args.data_path, data_file)))
 
         # load robot to pybullet
@@ -496,4 +497,5 @@ if __name__ == "__main__":
         skeleton = json_to_joints(motion)
         adam_data = skeleton2adam(skeleton)
         result = whole_body_ik(urdf_path, adam_data, gui=False)
+        print('num of frames:', result['root_pos'].shape[0])
         joblib.dump(result, os.path.join(args.out_dir, data_file.replace('.json', '.pt')))
