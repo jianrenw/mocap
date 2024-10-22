@@ -21,11 +21,13 @@
 #
 # 2018.01.02
 
-import glob, os
+import glob
+import os
 
 import torch
-from torch.utils.data import Dataset
 from configer import Configer
+from torch.utils.data import Dataset
+
 
 class VPoserDS(Dataset):
     """AMASS: a pytorch loader for unified human motion capture dataset. http://amass.is.tue.mpg.de/"""

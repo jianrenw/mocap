@@ -1,9 +1,10 @@
 import os
-import numpy as np
-from isaacgym import gymapi,gymtorch,gymutil
-import joblib
-import torch
 import time
+
+import joblib
+import numpy as np
+import torch
+from isaacgym import gymapi, gymtorch, gymutil
 
 # Initialize Gym
 gym = gymapi.acquire_gym()
@@ -19,11 +20,13 @@ sim_params.use_gpu_pipeline = False
 if args.use_gpu_pipeline:
     print("WARNING: Forcing CPU pipeline.")
 
-sim = gym.create_sim(args.compute_device_id, args.graphics_device_id, args.physics_engine, sim_params)
+sim = gym.create_sim(
+    args.compute_device_id, args.graphics_device_id, args.physics_engine, sim_params
+)
 
 # configure the ground plane
 plane_params = gymapi.PlaneParams()
-plane_params.normal = gymapi.Vec3(0, 0, 1) # z-up!
+plane_params.normal = gymapi.Vec3(0, 0, 1)  # z-up!
 plane_params.distance = 0
 plane_params.static_friction = 1
 plane_params.dynamic_friction = 1
@@ -51,7 +54,7 @@ actor_handle = gym.create_actor(env, robot_asset, pose, "h1_actor", 0, 1)
 # create viewer using the default camera properties
 viewer = gym.create_viewer(sim, gymapi.CameraProperties())
 if viewer is None:
-    raise ValueError('*** Failed to create viewer')
+    raise ValueError("*** Failed to create viewer")
 
 # Look at the first env
 cam_pos = gymapi.Vec3(8, 4, 1.5)
@@ -73,18 +76,25 @@ frame_num = len(root_pos)
 
 # root_pos[:,2] += 0.05
 
-root_states = torch.cat([torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)], dim=1).type(torch.float32)
+root_states = torch.cat(
+    [torch.from_numpy(root_pos), torch.from_numpy(root_rot), torch.zeros(frame_num, 6)],
+    dim=1,
+).type(torch.float32)
 # joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 19)],axis=2).type(torch.float32)
-joint_poses = torch.stack([torch.from_numpy(dof_pos), torch.zeros(frame_num, 19)],axis=2).type(torch.float32)
+joint_poses = torch.stack(
+    [torch.from_numpy(dof_pos), torch.zeros(frame_num, 19)], axis=2
+).type(torch.float32)
 # print(root_states)
 
 
 def draw_reference(gym, viewer, env_handle, body_pos, radius=0.01):
-    track_link = [0,1,2,3,4,5,6,7,8,9,10,13,14,15,16,18,19,20,21]
+    track_link = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 18, 19, 20, 21]
     updated_body_pos = body_pos[track_link]
     for ubp in updated_body_pos:
         sphere_pose = gymapi.Transform(gymapi.Vec3(ubp[0], ubp[1], ubp[2]), r=None)
-        sphere_geom = gymutil.WireframeSphereGeometry(radius, 4, 4, None, color=(1, 0, 0))
+        sphere_geom = gymutil.WireframeSphereGeometry(
+            radius, 4, 4, None, color=(1, 0, 0)
+        )
         gymutil.draw_lines(sphere_geom, gym, viewer, env_handle, sphere_pose)
 
 

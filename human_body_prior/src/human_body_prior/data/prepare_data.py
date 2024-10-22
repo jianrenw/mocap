@@ -28,8 +28,9 @@ import shutil
 import numpy as np
 import torch
 from configer import Configer
-from human_body_prior.tools.omni_tools import logger_sequencer
-from human_body_prior.tools.omni_tools import makepath, log2file
+
+from human_body_prior.tools.omni_tools import (log2file, logger_sequencer,
+                                               makepath)
 
 
 def dataset_exists(dataset_dir, split_names=None):

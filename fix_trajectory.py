@@ -1,7 +1,8 @@
 import joblib
-from utils import torch_utils
-import torch
 import matplotlib.pyplot as plt
+import torch
+
+from utils import torch_utils
 
 adam_pose = joblib.load("data/videos/walk.pkl")
 
@@ -29,16 +30,16 @@ plt.legend(legend)
 plt.show()
 
 # fix euler angles
-euler[373:,1] = 0.1
+euler[373:, 1] = 0.1
 euler = torch.from_numpy(euler)
-roll = euler[:,0]
-pitch = euler[:,1]
+roll = euler[:, 0]
+pitch = euler[:, 1]
 yaw = 0.8
 root_rot_new = torch_utils.quat_from_euler_xyz(roll, pitch, yaw)
 
 root_rot_new = root_rot_new.numpy()
 
-root_pos[:,0] = 0
+root_pos[:, 0] = 0
 
 
 adam_pose["root_rot"] = root_rot_new

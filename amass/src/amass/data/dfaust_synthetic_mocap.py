@@ -20,16 +20,17 @@
 # Nima Ghorbani <https://nghorbani.github.io/>
 #
 # 2019.08.09
-import torch
-
-from human_body_prior.tools.omni_tools import makepath
-from human_body_prior.tools.omni_tools import copy2cpu as c2c
-
-import json
-import numpy as np
 import glob
+import json
 import os
 import pickle
+
+import numpy as np
+import torch
+
+from human_body_prior.tools.omni_tools import copy2cpu as c2c
+from human_body_prior.tools.omni_tools import makepath
+
 
 def compute_vertex_normal(vertices, indices):
     # code obtained from https://github.com/BachiLi/redner

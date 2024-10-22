@@ -27,20 +27,21 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
-
-from isaacgym.torch_utils import *
 import torch
-from torch import nn
-import utils.pytorch3d_transforms as ptr
 import torch.nn.functional as F
+from isaacgym.torch_utils import *
+from torch import nn
+
+import utils.pytorch3d_transforms as ptr
 
 
-def project_to_norm(x, norm=5, z_type = "sphere"):
+def project_to_norm(x, norm=5, z_type="sphere"):
     if z_type == "sphere":
         x = x / (torch.norm(x, dim=-1, keepdim=True) / norm + 1e-8)
     elif z_type == "uniform":
         x = torch.clamp(x, -norm, norm)
     return x
+
 
 @torch.jit.script
 def my_quat_rotate(q, v):
@@ -49,10 +50,13 @@ def my_quat_rotate(q, v):
     q_vec = q[:, :3]
     a = v * (2.0 * q_w**2 - 1.0).unsqueeze(-1)
     b = torch.cross(q_vec, v, dim=-1) * q_w.unsqueeze(-1) * 2.0
-    c = q_vec * \
-        torch.bmm(q_vec.view(shape[0], 1, 3), v.view(
-            shape[0], 3, 1)).squeeze(-1) * 2.0
+    c = (
+        q_vec
+        * torch.bmm(q_vec.view(shape[0], 1, 3), v.view(shape[0], 3, 1)).squeeze(-1)
+        * 2.0
+    )
     return a + b + c
+
 
 @torch.jit.script
 def quat_to_angle_axis(q):
@@ -77,6 +81,7 @@ def quat_to_angle_axis(q):
     axis = torch.where(mask_expand, axis, default_axis)
     return angle, axis
 
+
 @torch.jit.script
 def euler_from_quat(q):
     """
@@ -85,23 +90,24 @@ def euler_from_quat(q):
     pitch is rotation around y in radians (counterclockwise)
     yaw is rotation around z in radians (counterclockwise)
     """
-    x = q[:,0]
-    y = q[:,1]
-    z = q[:,2]
-    w = q[:,3]
+    x = q[:, 0]
+    y = q[:, 1]
+    z = q[:, 2]
+    w = q[:, 3]
     t0 = 2.0 * (w * x + y * z)
     t1 = 1.0 - 2.0 * (x * x + y * y)
     roll_x = torch.atan2(t0, t1)
-    
+
     t2 = 2.0 * (w * y - z * x)
     t2 = torch.clip(t2, -1, 1)
     pitch_y = torch.asin(t2)
-    
+
     t3 = 2.0 * (w * z + x * y)
     t4 = 1.0 - 2.0 * (y * y + z * z)
     yaw_z = torch.atan2(t3, t4)
-    
-    return torch.stack([roll_x, pitch_y, yaw_z], dim=-1) # in radians
+
+    return torch.stack([roll_x, pitch_y, yaw_z], dim=-1)  # in radians
+
 
 @torch.jit.script
 def angle_axis_to_exp_map(angle, axis):
@@ -264,12 +270,13 @@ def calc_heading_quat_inv(q):
     heading_q = quat_from_angle_axis(-heading, axis)
     return heading_q
 
+
 def activation_facotry(act_name):
-    if act_name == 'relu':
+    if act_name == "relu":
         return nn.ReLU
-    elif act_name == 'tanh':
+    elif act_name == "tanh":
         return nn.Tanh
-    elif act_name == 'sigmoid':
+    elif act_name == "sigmoid":
         return nn.Sigmoid
     elif act_name == "elu":
         return nn.ELU

@@ -1,12 +1,13 @@
-import open3d as o3d
-import os
 import copy
+import os
 
-mesh_dir = '/home/jianrenw/mocap/robots/adam_standard/meshes'
+import open3d as o3d
+
+mesh_dir = "/home/jianrenw/mocap/robots/adam_standard/meshes"
 mesh_files = os.listdir(mesh_dir)
 target_num_triangles = 20000
 for mesh_file in mesh_files:
-    if mesh_file.endswith('.STL'):
+    if mesh_file.endswith(".STL"):
         # Load the STL file
         mesh = o3d.io.read_triangle_mesh(os.path.join(mesh_dir, mesh_file))
         original_mesh = copy.deepcopy(mesh)
@@ -26,4 +27,6 @@ for mesh_file in mesh_files:
                 print(mesh_file, "Failed to repair the mesh.")
 
         # Export the mesh to an OBJ file
-        o3d.io.write_triangle_mesh(os.path.join(mesh_dir, mesh_file[:-4] + '.obj'), mesh)
+        o3d.io.write_triangle_mesh(
+            os.path.join(mesh_dir, mesh_file[:-4] + ".obj"), mesh
+        )

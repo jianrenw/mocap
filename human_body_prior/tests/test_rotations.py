@@ -23,12 +23,12 @@
 
 import unittest
 
+import cv2
+import numpy as np
+import torch
+
 from human_body_prior.tools.omni_tools import copy2cpu as c2c
 from human_body_prior.train.vposer_smpl import VPoser
-
-import numpy as np
-import cv2
-import torch
 
 
 class TestRotationConversions(unittest.TestCase):
@@ -37,25 +37,25 @@ class TestRotationConversions(unittest.TestCase):
         aa = np.random.randn(10, 3)
         cv2_matrot = []
         for id in range(aa.shape[0]):
-            cv2_matrot.append(cv2.Rodrigues(aa[id:id+1])[0])
-        cv2_matrot = np.array(cv2_matrot).reshape(-1,9)
+            cv2_matrot.append(cv2.Rodrigues(aa[id : id + 1])[0])
+        cv2_matrot = np.array(cv2_matrot).reshape(-1, 9)
 
-        vposer_matrot = c2c(VPoser.aa2matrot(torch.tensor(aa))).reshape(-1,9)
+        vposer_matrot = c2c(VPoser.aa2matrot(torch.tensor(aa))).reshape(-1, 9)
         self.assertAlmostEqual(np.square((vposer_matrot - cv2_matrot)).sum(), 0.0)
 
     def test_matrot2aa(self):
         np.random.seed(100)
         aa = np.random.randn(10, 3)
-        matrot = c2c(VPoser.aa2matrot(torch.tensor(aa))).reshape(-1,9)
+        matrot = c2c(VPoser.aa2matrot(torch.tensor(aa))).reshape(-1, 9)
 
         cv2_aa = []
         for id in range(matrot.shape[0]):
-            cv2_aa.append(cv2.Rodrigues(matrot[id].reshape(3,3))[0])
-        cv2_aa = np.array(cv2_aa).reshape(-1,3)
+            cv2_aa.append(cv2.Rodrigues(matrot[id].reshape(3, 3))[0])
+        cv2_aa = np.array(cv2_aa).reshape(-1, 3)
 
-        vposer_aa = c2c(VPoser.matrot2aa(torch.tensor(matrot))).reshape(-1,3)
+        vposer_aa = c2c(VPoser.matrot2aa(torch.tensor(matrot))).reshape(-1, 3)
         self.assertAlmostEqual(np.square((vposer_aa - cv2_aa)).sum(), 0.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

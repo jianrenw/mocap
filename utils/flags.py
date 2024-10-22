@@ -1,17 +1,21 @@
-__all__ = ['flags', 'summation']
+__all__ = ["flags", "summation"]
+
 
 class Flags(object):
     def __init__(self, items):
         for key, val in items.items():
-            setattr(self,key,val)
+            setattr(self, key, val)
 
-flags = Flags({
-    'test': False, 
-    'debug': False,
-    "real_traj": False,
-    "im_eval": False,
-    "no_virtual_display": True,
-    "divide_group":False,
-    "server_mode": False,
-    "no_collision_check": True,
-    })
+
+flags = Flags(
+    {
+        "test": False,
+        "debug": False,
+        "real_traj": False,
+        "im_eval": False,
+        "no_virtual_display": True,
+        "divide_group": False,
+        "server_mode": False,
+        "no_collision_check": True,
+    }
+)

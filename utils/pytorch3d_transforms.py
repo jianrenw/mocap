@@ -141,25 +141,29 @@ def matrix_to_quaternion(matrix: torch.Tensor) -> torch.Tensor:
         raise ValueError(f"Invalid rotation matrix shape {matrix.shape}.")
 
     batch_dim = matrix.shape[:-2]
-    m00, m01, m02, m10, m11, m12, m20, m21, m22 = torch.unbind(matrix.reshape(batch_dim + (9,)), dim=-1)
+    m00, m01, m02, m10, m11, m12, m20, m21, m22 = torch.unbind(
+        matrix.reshape(batch_dim + (9,)), dim=-1
+    )
 
-    q_abs = _sqrt_positive_part(torch.stack(
-        [
-            1.0 + m00 + m11 + m22,
-            1.0 + m00 - m11 - m22,
-            1.0 - m00 + m11 - m22,
-            1.0 - m00 - m11 + m22,
-        ],
-        dim=-1,
-    ))
+    q_abs = _sqrt_positive_part(
+        torch.stack(
+            [
+                1.0 + m00 + m11 + m22,
+                1.0 + m00 - m11 - m22,
+                1.0 - m00 + m11 - m22,
+                1.0 - m00 - m11 + m22,
+            ],
+            dim=-1,
+        )
+    )
 
     # we produce the desired quaternion multiplied by each of r, i, j, k
     quat_by_rijk = torch.stack(
         [
-            torch.stack([q_abs[..., 0]**2, m21 - m12, m02 - m20, m10 - m01], dim=-1),
-            torch.stack([m21 - m12, q_abs[..., 1]**2, m10 + m01, m02 + m20], dim=-1),
-            torch.stack([m02 - m20, m10 + m01, q_abs[..., 2]**2, m12 + m21], dim=-1),
-            torch.stack([m10 - m01, m20 + m02, m21 + m12, q_abs[..., 3]**2], dim=-1),
+            torch.stack([q_abs[..., 0] ** 2, m21 - m12, m02 - m20, m10 - m01], dim=-1),
+            torch.stack([m21 - m12, q_abs[..., 1] ** 2, m10 + m01, m02 + m20], dim=-1),
+            torch.stack([m02 - m20, m10 + m01, q_abs[..., 2] ** 2, m12 + m21], dim=-1),
+            torch.stack([m10 - m01, m20 + m02, m21 + m12, q_abs[..., 3] ** 2], dim=-1),
         ],
         dim=-2,
     )
@@ -172,7 +176,11 @@ def matrix_to_quaternion(matrix: torch.Tensor) -> torch.Tensor:
     # if not for numerical problems, quat_candidates[i] should be same (up to a sign),
     # forall i; we pick the best-conditioned one (with the largest denominator)
 
-    return quat_candidates[F.one_hot(q_abs.argmax(dim=-1), num_classes=4) > 0.5, :].reshape(batch_dim + (4,))  # pyre-ignore[16]
+    return quat_candidates[
+        F.one_hot(q_abs.argmax(dim=-1), num_classes=4) > 0.5, :
+    ].reshape(
+        batch_dim + (4,)
+    )  # pyre-ignore[16]
 
 
 @torch.jit.script
@@ -190,25 +198,29 @@ def matrix_to_quaternion_ijkr(matrix: torch.Tensor) -> torch.Tensor:
         raise ValueError(f"Invalid rotation matrix shape {matrix.shape}.")
 
     batch_dim = matrix.shape[:-2]
-    m00, m01, m02, m10, m11, m12, m20, m21, m22 = torch.unbind(matrix.reshape(batch_dim + (9,)), dim=-1)
+    m00, m01, m02, m10, m11, m12, m20, m21, m22 = torch.unbind(
+        matrix.reshape(batch_dim + (9,)), dim=-1
+    )
 
-    q_abs = _sqrt_positive_part(torch.stack(
-        [
-            1.0 + m00 - m11 - m22,
-            1.0 - m00 + m11 - m22,
-            1.0 - m00 - m11 + m22,
-            1.0 + m00 + m11 + m22,
-        ],
-        dim=-1,
-    ))
+    q_abs = _sqrt_positive_part(
+        torch.stack(
+            [
+                1.0 + m00 - m11 - m22,
+                1.0 - m00 + m11 - m22,
+                1.0 - m00 - m11 + m22,
+                1.0 + m00 + m11 + m22,
+            ],
+            dim=-1,
+        )
+    )
 
     # we produce the desired quaternion multiplied by each of r, i, j, k
     quat_by_ijkr = torch.stack(
         [
-            torch.stack([q_abs[..., 0]**2, m10 + m01, m02 + m20, m21 - m12], dim=-1),
-            torch.stack([m10 + m01, q_abs[..., 1]**2, m21 + m12, m02 - m20], dim=-1),
-            torch.stack([m02 + m20, m12 + m21, q_abs[..., 2]**2, m10 - m01], dim=-1),
-            torch.stack([m21 - m12, m02 - m20, m10 - m01, q_abs[..., 3]**2], dim=-1),
+            torch.stack([q_abs[..., 0] ** 2, m10 + m01, m02 + m20, m21 - m12], dim=-1),
+            torch.stack([m10 + m01, q_abs[..., 1] ** 2, m21 + m12, m02 - m20], dim=-1),
+            torch.stack([m02 + m20, m12 + m21, q_abs[..., 2] ** 2, m10 - m01], dim=-1),
+            torch.stack([m21 - m12, m02 - m20, m10 - m01, q_abs[..., 3] ** 2], dim=-1),
         ],
         dim=-2,
     )
@@ -216,7 +228,11 @@ def matrix_to_quaternion_ijkr(matrix: torch.Tensor) -> torch.Tensor:
     flr = torch.tensor(0.1).to(dtype=q_abs.dtype, device=q_abs.device)
     quat_candidates = quat_by_ijkr / (2.0 * q_abs[..., None].max(flr))
 
-    return quat_candidates[F.one_hot(q_abs.argmax(dim=-1), num_classes=4) > 0.5, :].reshape(batch_dim + (4,))  # pyre-ignore[16]
+    return quat_candidates[
+        F.one_hot(q_abs.argmax(dim=-1), num_classes=4) > 0.5, :
+    ].reshape(
+        batch_dim + (4,)
+    )  # pyre-ignore[16]
 
 
 @torch.jit.script
@@ -234,25 +250,29 @@ def matrix_to_quaternion(matrix: torch.Tensor) -> torch.Tensor:
         raise ValueError(f"Invalid rotation matrix shape {matrix.shape}.")
 
     batch_dim = matrix.shape[:-2]
-    m00, m01, m02, m10, m11, m12, m20, m21, m22 = torch.unbind(matrix.reshape(batch_dim + (9,)), dim=-1)
+    m00, m01, m02, m10, m11, m12, m20, m21, m22 = torch.unbind(
+        matrix.reshape(batch_dim + (9,)), dim=-1
+    )
 
-    q_abs = _sqrt_positive_part(torch.stack(
-        [
-            1.0 + m00 + m11 + m22,
-            1.0 + m00 - m11 - m22,
-            1.0 - m00 + m11 - m22,
-            1.0 - m00 - m11 + m22,
-        ],
-        dim=-1,
-    ))
+    q_abs = _sqrt_positive_part(
+        torch.stack(
+            [
+                1.0 + m00 + m11 + m22,
+                1.0 + m00 - m11 - m22,
+                1.0 - m00 + m11 - m22,
+                1.0 - m00 - m11 + m22,
+            ],
+            dim=-1,
+        )
+    )
 
     # we produce the desired quaternion multiplied by each of r, i, j, k
     quat_by_rijk = torch.stack(
         [
-            torch.stack([q_abs[..., 0]**2, m21 - m12, m02 - m20, m10 - m01], dim=-1),
-            torch.stack([m21 - m12, q_abs[..., 1]**2, m10 + m01, m02 + m20], dim=-1),
-            torch.stack([m02 - m20, m10 + m01, q_abs[..., 2]**2, m12 + m21], dim=-1),
-            torch.stack([m10 - m01, m20 + m02, m21 + m12, q_abs[..., 3]**2], dim=-1),
+            torch.stack([q_abs[..., 0] ** 2, m21 - m12, m02 - m20, m10 - m01], dim=-1),
+            torch.stack([m21 - m12, q_abs[..., 1] ** 2, m10 + m01, m02 + m20], dim=-1),
+            torch.stack([m02 - m20, m10 + m01, q_abs[..., 2] ** 2, m12 + m21], dim=-1),
+            torch.stack([m10 - m01, m20 + m02, m21 + m12, q_abs[..., 3] ** 2], dim=-1),
         ],
         dim=-2,
     )
@@ -265,7 +285,11 @@ def matrix_to_quaternion(matrix: torch.Tensor) -> torch.Tensor:
     # if not for numerical problems, quat_candidates[i] should be same (up to a sign),
     # forall i; we pick the best-conditioned one (with the largest denominator)
 
-    return quat_candidates[F.one_hot(q_abs.argmax(dim=-1), num_classes=4) > 0.5, :].reshape(batch_dim + (4,))  # pyre-ignore[16]
+    return quat_candidates[
+        F.one_hot(q_abs.argmax(dim=-1), num_classes=4) > 0.5, :
+    ].reshape(
+        batch_dim + (4,)
+    )  # pyre-ignore[16]
 
 
 def _axis_angle_rotation(axis: str, angle: torch.Tensor) -> torch.Tensor:
@@ -319,12 +343,17 @@ def euler_angles_to_matrix(euler_angles: torch.Tensor, convention: str) -> torch
     for letter in convention:
         if letter not in ("X", "Y", "Z"):
             raise ValueError(f"Invalid letter {letter} in convention string.")
-    matrices = [_axis_angle_rotation(c, e) for c, e in zip(convention, torch.unbind(euler_angles, -1))]
+    matrices = [
+        _axis_angle_rotation(c, e)
+        for c, e in zip(convention, torch.unbind(euler_angles, -1))
+    ]
     # return functools.reduce(torch.matmul, matrices)
     return torch.matmul(torch.matmul(matrices[0], matrices[1]), matrices[2])
 
 
-def _angle_from_tan(axis: str, other_axis: str, data, horizontal: bool, tait_bryan: bool) -> torch.Tensor:
+def _angle_from_tan(
+    axis: str, other_axis: str, data, horizontal: bool, tait_bryan: bool
+) -> torch.Tensor:
     """
     Extract the first or third Euler angle from the two members of
     the matrix which are positive constant times its sine and cosine.
@@ -389,19 +418,27 @@ def matrix_to_euler_angles(matrix: torch.Tensor, convention: str) -> torch.Tenso
     i2 = _index_from_letter(convention[2])
     tait_bryan = i0 != i2
     if tait_bryan:
-        central_angle = torch.asin(matrix[..., i0, i2] * (-1.0 if i0 - i2 in [-1, 2] else 1.0))
+        central_angle = torch.asin(
+            matrix[..., i0, i2] * (-1.0 if i0 - i2 in [-1, 2] else 1.0)
+        )
     else:
         central_angle = torch.acos(matrix[..., i0, i0])
 
     o = (
-        _angle_from_tan(convention[0], convention[1], matrix[..., i2], False, tait_bryan),
+        _angle_from_tan(
+            convention[0], convention[1], matrix[..., i2], False, tait_bryan
+        ),
         central_angle,
-        _angle_from_tan(convention[2], convention[1], matrix[..., i0, :], True, tait_bryan),
+        _angle_from_tan(
+            convention[2], convention[1], matrix[..., i0, :], True, tait_bryan
+        ),
     )
     return torch.stack(o, -1)
 
 
-def random_quaternions(n: int, dtype: Optional[torch.dtype] = None, device: Optional[Device] = None) -> torch.Tensor:
+def random_quaternions(
+    n: int, dtype: Optional[torch.dtype] = None, device: Optional[Device] = None
+) -> torch.Tensor:
     """
     Generate random quaternions representing rotations,
     i.e. versors with nonnegative real part.
@@ -423,7 +460,9 @@ def random_quaternions(n: int, dtype: Optional[torch.dtype] = None, device: Opti
     return o
 
 
-def random_rotations(n: int, dtype: Optional[torch.dtype] = None, device: Optional[Device] = None) -> torch.Tensor:
+def random_rotations(
+    n: int, dtype: Optional[torch.dtype] = None, device: Optional[Device] = None
+) -> torch.Tensor:
     """
     Generate random rotations as 3x3 rotation matrices.
 
@@ -440,7 +479,9 @@ def random_rotations(n: int, dtype: Optional[torch.dtype] = None, device: Option
     return quaternion_to_matrix(quaternions)
 
 
-def random_rotation(dtype: Optional[torch.dtype] = None, device: Optional[Device] = None) -> torch.Tensor:
+def random_rotation(
+    dtype: Optional[torch.dtype] = None, device: Optional[Device] = None
+) -> torch.Tensor:
     """
     Generate a single random 3x3 rotation matrix.
 
@@ -598,11 +639,17 @@ def axis_angle_to_quaternion(axis_angle: torch.Tensor) -> torch.Tensor:
     eps = 1e-6
     small_angles = angles.abs() < eps
     sin_half_angles_over_angles = torch.empty_like(angles)
-    sin_half_angles_over_angles[~small_angles] = (torch.sin(half_angles[~small_angles]) / angles[~small_angles])
+    sin_half_angles_over_angles[~small_angles] = (
+        torch.sin(half_angles[~small_angles]) / angles[~small_angles]
+    )
     # for x small, sin(x/2) is about x/2 - (x/2)^3/6
     # so sin(x/2)/x is about 1/2 - (x*x)/48
-    sin_half_angles_over_angles[small_angles] = (0.5 - (angles[small_angles] * angles[small_angles]) / 48)
-    quaternions = torch.cat([torch.cos(half_angles), axis_angle * sin_half_angles_over_angles], dim=-1)
+    sin_half_angles_over_angles[small_angles] = (
+        0.5 - (angles[small_angles] * angles[small_angles]) / 48
+    )
+    quaternions = torch.cat(
+        [torch.cos(half_angles), axis_angle * sin_half_angles_over_angles], dim=-1
+    )
     return quaternions
 
 
@@ -626,10 +673,14 @@ def quaternion_to_axis_angle(quaternions: torch.Tensor) -> torch.Tensor:
     eps = 1e-6
     small_angles = angles.abs() < eps
     sin_half_angles_over_angles = torch.empty_like(angles)
-    sin_half_angles_over_angles[~small_angles] = (torch.sin(half_angles[~small_angles]) / angles[~small_angles])
+    sin_half_angles_over_angles[~small_angles] = (
+        torch.sin(half_angles[~small_angles]) / angles[~small_angles]
+    )
     # for x small, sin(x/2) is about x/2 - (x/2)^3/6
     # so sin(x/2)/x is about 1/2 - (x*x)/48
-    sin_half_angles_over_angles[small_angles] = (0.5 - (angles[small_angles] * angles[small_angles]) / 48)
+    sin_half_angles_over_angles[small_angles] = (
+        0.5 - (angles[small_angles] * angles[small_angles]) / 48
+    )
     return quaternions[..., 1:] / sin_half_angles_over_angles
 
 

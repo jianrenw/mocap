@@ -23,25 +23,32 @@
 
 import unittest
 
-from human_body_prior.train.vposer_smpl import VPoser
-from human_body_prior.tools.omni_tools import copy2cpu as c2c
+import numpy as np
 from configer import Configer
 
-import numpy as np
+from human_body_prior.tools.omni_tools import copy2cpu as c2c
+from human_body_prior.train.vposer_smpl import VPoser
+
 
 class TestDistances(unittest.TestCase):
     def setUp(self):
         import torch
+
         torch.manual_seed(100)
 
     def test_samples(self):
-        ''' given the same network weights, the random pose generator must produce the same pose for a seed'''
-        ps = Configer(default_ps_fname='../human_body_prior/train/V02_00.yaml')
-        vposer = VPoser(num_neurons=ps.num_neurons, latentD=ps.latentD, data_shape = ps.data_shape)
+        """given the same network weights, the random pose generator must produce the same pose for a seed"""
+        ps = Configer(default_ps_fname="../human_body_prior/train/V02_00.yaml")
+        vposer = VPoser(
+            num_neurons=ps.num_neurons, latentD=ps.latentD, data_shape=ps.data_shape
+        )
         body_pose_rnd = vposer.sample_poses(num_poses=1, seed=100)
 
-        body_pose_gt = np.load('samples/body_pose_rnd.npz')['data']
-        self.assertAlmostEqual(np.square((c2c(body_pose_rnd) - body_pose_gt)).sum(), 0.0)
+        body_pose_gt = np.load("samples/body_pose_rnd.npz")["data"]
+        self.assertAlmostEqual(
+            np.square((c2c(body_pose_rnd) - body_pose_gt)).sum(), 0.0
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

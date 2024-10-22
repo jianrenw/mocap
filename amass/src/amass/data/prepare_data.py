@@ -21,20 +21,21 @@
 #
 # 2019.08.09
 
-import os
-import numpy as np
-from human_body_prior.tools.omni_tools import makepath, log2file
-from human_body_prior.tools.rotation_tools import euler2em, em2euler, aa2matrot
-from human_body_prior.tools.omni_tools import copy2cpu as c2c
-
-import shutil, sys
-from torch.utils.data import Dataset
 import glob
+import os
+import shutil
+import sys
 from datetime import datetime
-import torch
-from torch.utils.data import DataLoader
+
+import numpy as np
 import tables as pytables
+import torch
+from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
+
+from human_body_prior.tools.omni_tools import copy2cpu as c2c
+from human_body_prior.tools.omni_tools import log2file, makepath
+from human_body_prior.tools.rotation_tools import aa2matrot, em2euler, euler2em
 
 gdr2num = {'male':-1, 'neutral':0, 'female':1}
 gdr2num_rev = {v:k for k,v in gdr2num.items()}

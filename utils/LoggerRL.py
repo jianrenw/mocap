@@ -1,13 +1,16 @@
 ############################################################################################################
 ### Functions are from https://github.com/Khrylx/PyTorch-RL
 ############################################################################################################
-import os
+import logging
 import math
+import os
 from collections import defaultdict
+
 import numpy as np
 import torch
-import logging
+
 torch.set_printoptions(precision=10)
+
 
 class LoggerRL:
 
@@ -24,7 +27,6 @@ class LoggerRL:
         self.avg_episode_reward = 0
         self.sample_time = 0
         self.info_dict = defaultdict(list)
-        
 
     def start_episode(self, env):
         self.episode_reward = 0
@@ -41,8 +43,12 @@ class LoggerRL:
     def end_episode(self, env):
         self.num_episodes += 1
         self.total_reward += self.episode_reward
-        self.min_episode_reward = min(self.min_episode_reward, torch.min(self.episode_reward))
-        self.max_episode_reward = max(self.max_episode_reward, torch.max(self.episode_reward))
+        self.min_episode_reward = min(
+            self.min_episode_reward, torch.min(self.episode_reward)
+        )
+        self.max_episode_reward = max(
+            self.max_episode_reward, torch.max(self.episode_reward)
+        )
 
     def end_sampling(self):
         self.avg_episode_len = self.num_steps / self.num_episodes
@@ -61,6 +67,9 @@ class LoggerRL:
         logger.avg_reward = logger.total_reward / logger.num_steps
         logger.max_reward = max([x.max_reward for x in logger_list])
         logger.min_reward = min([x.min_reward for x in logger_list])
-        logger.info_dict = {k: np.mean(np.concatenate([np.array(x.info_dict[k]) for x in logger_list])) for k in logger_list[0].info_dict.keys()}
-        
+        logger.info_dict = {
+            k: np.mean(np.concatenate([np.array(x.info_dict[k]) for x in logger_list]))
+            for k in logger_list[0].info_dict.keys()
+        }
+
         return logger

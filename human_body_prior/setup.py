@@ -22,33 +22,35 @@
 # 2019.05.10
 
 
-from setuptools import setup, find_packages
 from glob import glob
-setup(name='human_body_prior',
-      version='2.2.2.0',
-      packages=find_packages('src'),
-      package_dir={'': 'src'},
-      include_package_data=True,
-      data_files=[('human_body_prior/support_data', glob('support_data/*.*'))],
 
+from setuptools import find_packages, setup
 
-      author='Nima Ghorbani',
-      author_email='nghorbani@tue.mpg.de',
-      maintainer='Nima Ghorbani',
-      maintainer_email='nghorbani@tue.mpg.de',
-      url='https://github.com/nghorbani/human_body_prior',
-      description='Variational human pose prior for human pose synthesis and estimation.',
-      long_description=open("README.md").read(),
-      long_description_content_type="text/markdown",
-      install_requires=[],
-      dependency_links=[],
-      classifiers=[
-          "Intended Audience :: Research",
-          "Natural Language :: English",
-          "Operating System :: POSIX",
-          "Operating System :: POSIX :: BSD",
-          "Operating System :: POSIX :: Linux",
-          "Programming Language :: Python",
-          "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.7", ],
-      )
+setup(
+    name="human_body_prior",
+    version="2.2.2.0",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    include_package_data=True,
+    data_files=[("human_body_prior/support_data", glob("support_data/*.*"))],
+    author="Nima Ghorbani",
+    author_email="nghorbani@tue.mpg.de",
+    maintainer="Nima Ghorbani",
+    maintainer_email="nghorbani@tue.mpg.de",
+    url="https://github.com/nghorbani/human_body_prior",
+    description="Variational human pose prior for human pose synthesis and estimation.",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    install_requires=[],
+    dependency_links=[],
+    classifiers=[
+        "Intended Audience :: Research",
+        "Natural Language :: English",
+        "Operating System :: POSIX",
+        "Operating System :: POSIX :: BSD",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+    ],
+)

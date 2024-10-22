@@ -23,10 +23,11 @@
 
 import numpy as np
 import torch
-from human_body_prior.models.model_components import BatchFlatten
-from human_body_prior.tools.rotation_tools import matrot2aa
 from torch import nn
 from torch.nn import functional as F
+
+from human_body_prior.models.model_components import BatchFlatten
+from human_body_prior.tools.rotation_tools import matrot2aa
 
 
 class ContinousRotReprDecoder(nn.Module):
@@ -53,14 +54,19 @@ class NormalDistDecoder(nn.Module):
         self.logvar = nn.Linear(num_feat_in, latentD)
 
     def forward(self, Xout):
-        return torch.distributions.normal.Normal(self.mu(Xout), F.softplus(self.logvar(Xout)))
+        return torch.distributions.normal.Normal(
+            self.mu(Xout), F.softplus(self.logvar(Xout))
+        )
 
 
 class VPoser(nn.Module):
     def __init__(self, model_ps):
         super(VPoser, self).__init__()
 
-        num_neurons, self.latentD = model_ps.model_params.num_neurons, model_ps.model_params.latentD
+        num_neurons, self.latentD = (
+            model_ps.model_params.num_neurons,
+            model_ps.model_params.latentD,
+        )
 
         self.num_joints = 21
         n_features = self.num_joints * 3
@@ -74,7 +80,7 @@ class VPoser(nn.Module):
             nn.Dropout(0.1),
             nn.Linear(num_neurons, num_neurons),
             nn.Linear(num_neurons, num_neurons),
-            NormalDistDecoder(num_neurons, self.latentD)
+            NormalDistDecoder(num_neurons, self.latentD),
         )
 
         self.decoder_net = nn.Sequential(
@@ -88,11 +94,11 @@ class VPoser(nn.Module):
         )
 
     def encode(self, pose_body):
-        '''
+        """
         :param Pin: Nx(numjoints*3)
         :param rep_type: 'matrot'/'aa' for matrix rotations or axis-angle
         :return:
-        '''
+        """
         return self.encoder_net(pose_body)
 
     def decode(self, Zin):
@@ -101,23 +107,24 @@ class VPoser(nn.Module):
         prec = self.decoder_net(Zin)
 
         return {
-            'pose_body': matrot2aa(prec.view(-1, 3, 3)).view(bs, -1, 3),
-            'pose_body_matrot': prec.view(bs, -1, 9)
+            "pose_body": matrot2aa(prec.view(-1, 3, 3)).view(bs, -1, 3),
+            "pose_body_matrot": prec.view(bs, -1, 9),
         }
 
-
     def forward(self, pose_body):
-        '''
+        """
         :param Pin: aa: Nx1xnum_jointsx3 / matrot: Nx1xnum_jointsx9
         :param input_type: matrot / aa for matrix rotations or axis angles
         :param output_type: matrot / aa
         :return:
-        '''
+        """
 
         q_z = self.encode(pose_body)
         q_z_sample = q_z.rsample()
         decode_results = self.decode(q_z_sample)
-        decode_results.update({'poZ_body_mean': q_z.mean, 'poZ_body_std': q_z.scale, 'q_z': q_z})
+        decode_results.update(
+            {"poZ_body_mean": q_z.mean, "poZ_body_std": q_z.scale, "q_z": q_z}
+        )
         return decode_results
 
     def sample_poses(self, num_poses, seed=None):
@@ -128,6 +135,10 @@ class VPoser(nn.Module):
         device = some_weight.device
         self.eval()
         with torch.no_grad():
-            Zgen = torch.tensor(np.random.normal(0., 1., size=(num_poses, self.latentD)), dtype=dtype, device=device)
+            Zgen = torch.tensor(
+                np.random.normal(0.0, 1.0, size=(num_poses, self.latentD)),
+                dtype=dtype,
+                device=device,
+            )
 
         return self.decode(Zgen)

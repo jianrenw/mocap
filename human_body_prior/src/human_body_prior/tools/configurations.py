@@ -20,15 +20,19 @@
 # Nima Ghorbani <https://nghorbani.github.io/>
 #
 # 2020.12.12
-from dotmap import DotMap
 import os
+
 import yaml
+from dotmap import DotMap
+
 
 def load_config(default_ps_fname=None, **kwargs):
     if isinstance(default_ps_fname, str):
         assert os.path.exists(default_ps_fname), FileNotFoundError(default_ps_fname)
-        assert default_ps_fname.lower().endswith('.yaml'), NotImplementedError('Only .yaml files are accepted.')
-        default_ps = yaml.safe_load(open(default_ps_fname, 'r'))
+        assert default_ps_fname.lower().endswith(".yaml"), NotImplementedError(
+            "Only .yaml files are accepted."
+        )
+        default_ps = yaml.safe_load(open(default_ps_fname, "r"))
     else:
         default_ps = {}
 
@@ -36,12 +40,13 @@ def load_config(default_ps_fname=None, **kwargs):
 
     return DotMap(default_ps, _dynamic=False)
 
+
 def dump_config(data, fname):
-    '''
+    """
     dump current configuration to an ini file
     :param fname:
     :return:
-    '''
-    with open(fname, 'w') as file:
+    """
+    with open(fname, "w") as file:
         yaml.dump(data.toDict(), file)
     return fname
