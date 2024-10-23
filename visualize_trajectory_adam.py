@@ -3,8 +3,8 @@ import time
 
 import joblib
 import numpy as np
-import torch
 from isaacgym import gymapi, gymtorch, gymutil
+import torch
 
 # Initialize Gym
 gym = gymapi.acquire_gym()
@@ -88,7 +88,8 @@ key = (
     # "directing-over-there"
     # "greeting-small-wave"
     # "thanks-gentleman-bow"
-    "greeting-bye"
+    "greeting_bye"
+    # "male_idle_279398"
 )
 adam_pose = adam_poses[key]
 
